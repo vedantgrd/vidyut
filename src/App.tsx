@@ -16,6 +16,7 @@ const SignupPage = lazy(() => import('@/pages/auth/SignupPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'));
 const EmailVerificationPage = lazy(() => import('@/pages/auth/EmailVerificationPage'));
 const UnauthorizedPage = lazy(() => import('@/pages/auth/UnauthorizedPage'));
+const DashboardHomePage = lazy(() => import('@/pages/dashboard/DashboardHomePage'));
 const PlaceholderPage = lazy(() => import('@/pages/PlaceholderPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
@@ -77,7 +78,12 @@ const AnimatedRoutes = () => {
         {/* Authenticated Dashboard Routes */}
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
-            {ALL_ROUTES.map((route) => (
+            <Route path="/dashboard" element={
+              <Suspense fallback={null}>
+                <DashboardHomePage />
+              </Suspense>
+            } />
+            {ALL_ROUTES.filter(r => r.path !== '/dashboard').map((route) => (
               <Route 
                 key={route.path} 
                 path={route.path} 
