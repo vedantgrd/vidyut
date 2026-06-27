@@ -1,0 +1,46 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--surface-1);
+}
+
+.mainWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  /* Hardware acceleration for smooth scrolling */
+  transform: translateZ(0);
+}
+
+.content {
+  flex: 1;
+  padding: var(--space-xl);
+  /* The max-width constraint ensures content doesn't stretch infinitely on ultrawide monitors */
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.content:focus {
+  outline: none; /* Focus outline removed for programmatic focus */
+}
+
+/* Base scrollbar styling for the main content area */
+.mainWrapper::-webkit-scrollbar {
+  width: 8px;
+}
+.mainWrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+.mainWrapper::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: var(--radius-pill);
+}
+.mainWrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}

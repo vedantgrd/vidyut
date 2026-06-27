@@ -1,0 +1,71 @@
+.card {
+  position: relative;
+  overflow: hidden;
+  will-change: transform, box-shadow;
+  /* Default text colors inside a card */
+  color: var(--text-primary);
+}
+
+/* --- Variants --- */
+.variant-default {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-1);
+}
+
+.variant-floating {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--elevation-3);
+}
+
+.variant-solid {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-1);
+}
+
+/* Fallback for backdrop-filter */
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+  .variant-default {
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+  }
+  .variant-floating {
+    backdrop-filter: blur(48px) saturate(200%);
+    -webkit-backdrop-filter: blur(48px) saturate(200%);
+  }
+}
+
+/* --- Padding --- */
+.padding-none { padding: 0; }
+.padding-sm { padding: var(--space-md); }
+.padding-md { padding: var(--space-lg); }
+.padding-lg { padding: var(--space-xl); }
+
+/* --- Interactivity --- */
+.interactive {
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--motion-spring),
+              box-shadow var(--duration-fast) var(--motion-spring),
+              border-color var(--duration-fast) var(--motion-spring);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .interactive:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--elevation-2);
+    border-color: var(--border-strong);
+  }
+  
+  .variant-solid.interactive:hover {
+    background: var(--surface-3);
+  }
+}
+
+.interactive:active {
+  transform: translateY(0) scale(0.98);
+}

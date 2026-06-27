@@ -1,0 +1,171 @@
+@import './variables.css';
+@import './utilities.css';
+
+/* =========================================================================
+   Modern CSS Reset & Global Normalization
+   ========================================================================= */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* Provides correct default colors for browser UI elements (scrollbars, etc.) */
+  color-scheme: light dark;
+  -webkit-text-size-adjust: 100%;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--surface-1);
+  color: var(--text-primary);
+  font-size: var(--text-body-base);
+  line-height: var(--leading-normal);
+  /* GPU-friendly transitions for theme switching */
+  transition: background-color var(--duration-normal) var(--motion-spring),
+              color var(--duration-normal) var(--motion-spring);
+}
+
+#root {
+  /* Ensure the app shell fills the viewport */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* Stacking context isolation */
+  isolation: isolate;
+}
+
+/* =========================================================================
+   Typography Base
+   ========================================================================= */
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  /* Prevent layout shifts from overly long continuous text */
+  overflow-wrap: break-word;
+}
+
+h1 {
+  font-size: var(--text-h1);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  font-weight: 600;
+}
+
+h2 {
+  font-size: var(--text-h2);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-normal);
+  font-weight: 600;
+}
+
+h3 {
+  font-size: var(--text-h3);
+  line-height: var(--leading-snug);
+  font-weight: 500;
+}
+
+p {
+  color: var(--text-secondary);
+  font-size: var(--text-body-base);
+  line-height: var(--leading-normal);
+}
+
+/* =========================================================================
+   Accessibility & Interactive Defaults
+   ========================================================================= */
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  /* Prevent iOS tap highlight */
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:disabled, input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  outline: none;
+}
+
+/* Focus Management for Accessibility */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--interactive-primary);
+  outline-offset: 2px;
+}
+
+/* Brand Selection Styling */
+::selection {
+  background-color: var(--brand-magic-start);
+  color: #FFFFFF;
+}
+
+/* =========================================================================
+   Media Defaults
+   ========================================================================= */
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+  /* Optimize image rendering */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* =========================================================================
+   Scrollbar Fallback (For Non-Mac Users)
+   ========================================================================= */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--surface-1);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* =========================================================================
+   Prefers Reduced Motion
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

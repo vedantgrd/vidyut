@@ -1,0 +1,16 @@
+.landingPage {
+  width: 100%;
+  background-color: var(--surface-1);
+  overflow-x: hidden;
+  /* Ensure smooth scrolling behavior native to the browser */
+  scroll-behavior: smooth;
+}
+
+/* Base styles for sections */
+.section {
+  position: relative;
+  width: 100%;
+  padding: var(--space-4xl) var(--space-xl);
+  max-width: 1440px;
+  margin: 0 auto;
+}

@@ -1,0 +1,124 @@
+:root {
+  /* =========================================================================
+     1. Spacing System (8px Baseline)
+     ========================================================================= */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+
+  /* =========================================================================
+     2. Border Radius (Squircle-inspired)
+     ========================================================================= */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 9999px;
+
+  /* =========================================================================
+     3. Fluid Typography Scale
+     Uses clamp() to fluidly scale between mobile and desktop without media queries.
+     Formula: clamp(min-size, fluid-calc, max-size)
+     ========================================================================= */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Instrument Serif', 'Times New Roman', serif;
+
+  --text-display: clamp(3rem, 5vw + 1rem, 4.5rem); /* 48px -> 72px */
+  --text-h1: clamp(2.25rem, 4vw + 1rem, 3rem);     /* 36px -> 48px */
+  --text-h2: clamp(1.5rem, 3vw + 0.5rem, 2rem);    /* 24px -> 32px */
+  --text-h3: clamp(1.25rem, 2vw + 0.5rem, 1.5rem); /* 20px -> 24px */
+  --text-body-lg: clamp(1rem, 1vw + 0.5rem, 1.125rem); /* 16px -> 18px */
+  --text-body-base: clamp(0.875rem, 1vw + 0.5rem, 1rem); /* 14px -> 16px */
+  --text-caption: 0.8125rem; /* 13px */
+
+  --leading-tight: 1.1;
+  --leading-snug: 1.25;
+  --leading-normal: 1.5;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.01em;
+
+  /* =========================================================================
+     4. Motion & Animation Curves
+     GPU-accelerated easing functions.
+     ========================================================================= */
+  --motion-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --motion-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 200ms;
+  --duration-normal: 400ms;
+  --duration-slow: 600ms;
+
+  /* =========================================================================
+     5. Semantic Color Tokens (Light Mode Default)
+     Abstracted away from hex values to functional names for scalability.
+     ========================================================================= */
+  --surface-1: #FAFAFA; /* App Background */
+  --surface-2: #FFFFFF; /* Base Cards */
+  --surface-3: #F4F4F5; /* Hover/Active Cards */
+  
+  --text-primary: #09090B;
+  --text-secondary: #71717A;
+  --text-tertiary: #A1A1AA;
+  
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.15);
+
+  /* Interactive States */
+  --interactive-primary: #09090B;
+  --interactive-hover: #27272A;
+  --interactive-active: #000000;
+  
+  /* Brand / AI Identity */
+  --brand-magic-start: #6366F1;
+  --brand-magic-end: #06B6D4;
+  
+  /* Semantic Statuses */
+  --status-success: #10B981;
+  --status-warning: #F59E0B;
+  --status-error: #F43F5E;
+
+  /* =========================================================================
+     6. Elevation & Depth
+     ========================================================================= */
+  --elevation-1: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --elevation-2: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --elevation-3: 0 24px 64px rgba(0, 0, 0, 0.12);
+  
+  /* Glassmorphism Variables */
+  --glass-surface: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================================================
+   DARK MODE TOKENS
+   Triggered via data-theme on html/body or prefers-color-scheme logic.
+   ========================================================================= */
+[data-theme='dark'] {
+  --surface-1: #050505; 
+  --surface-2: #121214;
+  --surface-3: #1C1C1F;
+  
+  --text-primary: #EDEDED;
+  --text-secondary: #A1A1AA;
+  --text-tertiary: #71717A;
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  --interactive-primary: #EDEDED;
+  --interactive-hover: #FFFFFF;
+  --interactive-active: #D4D4D8;
+
+  --elevation-1: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --elevation-2: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --elevation-3: 0 24px 64px rgba(0, 0, 0, 0.6);
+  
+  --glass-surface: rgba(18, 18, 20, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}

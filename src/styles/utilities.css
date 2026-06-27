@@ -1,0 +1,74 @@
+/* =========================================================================
+   Aura Design System Utilities 
+   Reusable classes for complex visual treatments that don't belong 
+   in component-specific CSS Modules.
+   ========================================================================= */
+
+/* --- Glassmorphism --- */
+.aura-glass {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-1);
+}
+
+.aura-glass-floating {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--elevation-3);
+}
+
+/* Graceful degradation for backdrop-filter */
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+  .aura-glass {
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+  }
+  .aura-glass-floating {
+    backdrop-filter: blur(48px) saturate(200%);
+    -webkit-backdrop-filter: blur(48px) saturate(200%);
+  }
+}
+
+/* --- Layout Constraints --- */
+.aura-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+/* --- Typography Treatments --- */
+.text-display {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  line-height: var(--leading-tight);
+  font-weight: 400;
+  letter-spacing: var(--tracking-tight);
+}
+
+.text-gradient-magic {
+  background: linear-gradient(135deg, var(--brand-magic-start) 0%, var(--brand-magic-end) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* Prevent clipping bugs on some browsers */
+  display: inline-block;
+}
+
+/* --- Animation Utilities --- */
+.aura-animated-hover {
+  /* GPU-accelerated properties only */
+  transition: transform var(--duration-fast) var(--motion-spring),
+              box-shadow var(--duration-fast) var(--motion-spring),
+              border-color var(--duration-fast) var(--motion-spring);
+  will-change: transform, box-shadow;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .aura-animated-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--elevation-2);
+  }
+}

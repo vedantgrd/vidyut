@@ -1,0 +1,136 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  transition: background-color var(--duration-fast) var(--motion-spring),
+              border-color var(--duration-fast) var(--motion-spring),
+              color var(--duration-fast) var(--motion-spring),
+              box-shadow var(--duration-fast) var(--motion-spring);
+  will-change: transform, box-shadow;
+  /* Prevent iOS tap highlight */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--interactive-primary);
+  outline-offset: 2px;
+}
+
+/* --- Sizes --- */
+.size-sm {
+  height: 32px;
+  padding: 0 var(--space-md);
+  font-size: var(--text-caption);
+  border-radius: var(--radius-sm);
+}
+
+.size-md {
+  height: 44px;
+  padding: 0 var(--space-lg);
+  font-size: var(--text-body-base);
+}
+
+.size-lg {
+  height: 56px;
+  padding: 0 var(--space-xl);
+  font-size: var(--text-body-lg);
+  border-radius: var(--radius-lg);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* --- Variants --- */
+.variant-primary {
+  background-color: var(--interactive-primary);
+  color: var(--surface-1); /* Text is inverse of interactive */
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .variant-primary:hover:not(.disabled) {
+    background-color: var(--interactive-hover);
+    box-shadow: var(--elevation-1);
+  }
+}
+
+.variant-secondary {
+  background-color: var(--surface-2);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .variant-secondary:hover:not(.disabled) {
+    background-color: var(--surface-3);
+  }
+}
+
+.variant-ghost {
+  background-color: transparent;
+  color: var(--text-secondary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .variant-ghost:hover:not(.disabled) {
+    background-color: var(--surface-3);
+    color: var(--text-primary);
+  }
+}
+
+.variant-magic {
+  background: linear-gradient(135deg, var(--brand-magic-start) 0%, var(--brand-magic-end) 100%);
+  color: #FFFFFF;
+  border: none;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3); /* Custom soft glow for magic */
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .variant-magic:hover:not(.disabled) {
+    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5);
+  }
+}
+
+/* --- States --- */
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* --- Elements --- */
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon svg {
+  width: 1.25em;
+  height: 1.25em;
+}
+
+.spinner {
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
