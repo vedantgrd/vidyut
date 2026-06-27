@@ -1,5 +1,6 @@
+import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { isAuthenticated } from '@/services/auth';
+import { useAuthStore } from '@/features/auth/store/authStore';
 
 /**
  * ProtectedRoute
@@ -7,12 +8,11 @@ import { isAuthenticated } from '@/services/auth';
  * Currently uses mocked authentication logic for Milestone 5.
  */
 export const ProtectedRoute: React.FC = () => {
+  const { isAuthenticated } = useAuthStore();
   const location = useLocation();
-  
-  const isAuth = isAuthenticated();
 
-  if (!isAuth) {
-    // Redirect unauthenticated users to login, preserving their intended destination
+  if (!isAuthenticated) {
+    // Redirect to login page but save the intended destination
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
