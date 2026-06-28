@@ -8,7 +8,9 @@ import {
   Bell, 
   Settings, 
   User, 
-  HelpCircle
+  HelpCircle,
+  Sparkles,
+  Calendar as CalendarIcon
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -21,8 +23,10 @@ export interface RouteDefinition {
 
 export const ROUTES: Record<string, RouteDefinition> = {
   DASHBOARD: { path: '/dashboard', label: 'Command Center', icon: LayoutDashboard },
+  AI_ASSISTANT: { path: '/ai-assistant', label: 'AI Assistant', icon: Sparkles },
   DISCOVERY: { path: '/discovery', label: 'Scholarship Discovery', icon: Search },
   WORKSPACE: { path: '/workspace', label: 'Applications', icon: FileText },
+  CALENDAR: { path: '/calendar', label: 'Calendar', icon: CalendarIcon },
   VAULT: { path: '/vault', label: 'Smart Vault', icon: FolderOpen },
   TRACKER: { path: '/tracker', label: 'Verification Tracker', icon: Clock },
   PAYMENTS: { path: '/payments', label: 'Payment Tracker', icon: Wallet },
@@ -34,8 +38,10 @@ export const ROUTES: Record<string, RouteDefinition> = {
 
 export const SIDEBAR_ROUTES = [
   ROUTES.DASHBOARD,
+  ROUTES.AI_ASSISTANT,
   ROUTES.DISCOVERY,
   ROUTES.WORKSPACE,
+  ROUTES.CALENDAR,
   ROUTES.VAULT,
   ROUTES.TRACKER,
   ROUTES.PAYMENTS,

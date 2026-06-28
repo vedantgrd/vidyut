@@ -17,6 +17,13 @@ const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'))
 const EmailVerificationPage = lazy(() => import('@/pages/auth/EmailVerificationPage'));
 const UnauthorizedPage = lazy(() => import('@/pages/auth/UnauthorizedPage'));
 const DashboardHomePage = lazy(() => import('@/pages/dashboard/DashboardHomePage'));
+const DiscoveryPage = lazy(() => import('@/pages/dashboard/DiscoveryPage'));
+const AIAssistantPage = lazy(() => import('@/pages/dashboard/AIAssistantPage'));
+const TrackerPage = lazy(() => import('@/pages/dashboard/TrackerPage'));
+const CalendarPage = lazy(() => import('@/pages/dashboard/CalendarPage'));
+const NotificationsPage = lazy(() => import('@/pages/dashboard/NotificationsPage'));
+const ProfilePage = lazy(() => import('@/pages/dashboard/ProfilePage'));
+const SettingsPage = lazy(() => import('@/pages/dashboard/SettingsPage'));
 const PlaceholderPage = lazy(() => import('@/pages/PlaceholderPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
@@ -78,12 +85,16 @@ const AnimatedRoutes = () => {
         {/* Authenticated Dashboard Routes */}
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
-            <Route path="/dashboard" element={
-              <Suspense fallback={null}>
-                <DashboardHomePage />
-              </Suspense>
-            } />
-            {ALL_ROUTES.filter(r => r.path !== '/dashboard').map((route) => (
+            <Route path="/dashboard" element={<Suspense fallback={null}><DashboardHomePage /></Suspense>} />
+            <Route path="/discovery" element={<Suspense fallback={null}><DiscoveryPage /></Suspense>} />
+            <Route path="/ai-assistant" element={<Suspense fallback={null}><AIAssistantPage /></Suspense>} />
+            <Route path="/workspace" element={<Suspense fallback={null}><TrackerPage /></Suspense>} />
+            <Route path="/calendar" element={<Suspense fallback={null}><CalendarPage /></Suspense>} />
+            <Route path="/notifications" element={<Suspense fallback={null}><NotificationsPage /></Suspense>} />
+            <Route path="/profile" element={<Suspense fallback={null}><ProfilePage /></Suspense>} />
+            <Route path="/settings" element={<Suspense fallback={null}><SettingsPage /></Suspense>} />
+            
+            {ALL_ROUTES.filter(r => !['/dashboard', '/discovery', '/ai-assistant', '/workspace', '/calendar', '/notifications', '/profile', '/settings'].includes(r.path)).map((route) => (
               <Route 
                 key={route.path} 
                 path={route.path} 

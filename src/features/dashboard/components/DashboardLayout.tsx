@@ -25,11 +25,12 @@ interface DashboardSectionProps {
   title?: string;
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export const DashboardSection: React.FC<DashboardSectionProps> = React.memo(({ title, children, className }) => {
+export const DashboardSection: React.FC<DashboardSectionProps> = React.memo(({ title, children, className, style }) => {
   return (
-    <section className={`${styles.section} ${className || ''}`}>
+    <section className={`${styles.section} ${className || ''}`} style={style}>
       {title && <h2 className={styles.sectionTitle}>{title}</h2>}
       {children}
     </section>
