@@ -1,0 +1,17 @@
+{
+  "name": "vidyut",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/web",
+    "apps/server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=apps/server\" \"npm run dev --workspace=apps/web\"",
+    "db:seed": "npm run db:seed --workspace=apps/server"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "puppeteer-core": "^25.13.0"
+  }
+}

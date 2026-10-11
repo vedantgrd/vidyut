@@ -1,0 +1,17 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: vidyut_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vidyut
+      POSTGRES_PASSWORD: vidyut_password
+      POSTGRES_DB: vidyut_db
+    ports:
+      - '5433:5432'
+    volumes:
+      - vidyut_postgres_data:/var/lib/postgresql/data
+volumes:
+  vidyut_postgres_data:
+    driver: local
