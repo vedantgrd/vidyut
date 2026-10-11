@@ -1,219 +1,302 @@
 <div align="center">
 
-# ⚡ Vidyut (विद्युत)
-### *Building Vidyut because filling government forms manually is a personality test no one asked for.*
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1e40af,100:059669&height=280&section=header&text=Vidyut&fontSize=70&fontColor=ffffff&animation=fadeIn&fontAlign=50&fontAlignY=33&desc=%E0%A4%B5%E0%A4%BF%E0%A4%A6%E0%A5%8D%E0%A4%AF%E0%A5%81%E0%A4%A4%20%7C%20Scholarships%2C%20minus%20the%20paperwork&descAlign=50&descAlignY=58&descSize=20" alt="Vidyut banner" width="100%"/>
 
-[![React 19](https://img.shields.io/badge/React-19.0-61dafb?logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Hono](https://img.shields.io/badge/Hono-v4-e36002?logo=hono&logoColor=white)](https://hono.dev/)
-[![Prisma](https://img.shields.io/badge/Prisma-5.22-2d3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Vite](https://img.shields.io/badge/Vite-5.4-646cff?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+### ⚡ *Filling government forms manually is a personality test no one asked for.*
+
+**Tell Vidyut about yourself once. Vidyut handles the repetitive scholarship work.**
 
 <br/>
 
-**Vidyut** is an intelligent, high-trust scholarship discovery, vaulting, and application platform. It eliminates the repetitive paperwork headache by allowing students to enter their credentials once, store verified documents in an encrypted vault, match against complex eligibility criteria, and apply to dozens of verified government and private scholarships with 1 click.
+[![React 19](https://img.shields.io/badge/React-19.0-61dafb?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Hono](https://img.shields.io/badge/Hono-v4-e36002?style=for-the-badge&logo=hono&logoColor=white)](https://hono.dev/)
+[![Prisma](https://img.shields.io/badge/Prisma-5.22-2d3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Vite](https://img.shields.io/badge/Vite-5.4-646cff?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-• [Core Philosophy](#-the-core-philosophy) • [Key Features](#-key-features) • [Visual Tour](#-visual-tour) • [Architecture](#-architecture) • [Getting Started](#-getting-started) • [Demo Credentials](#-demo-credentials)
+<br/>
 
----
+[**🎯 Why**](#-why-vidyut-exists) &nbsp;•&nbsp;
+[**✨ Features**](#-features) &nbsp;•&nbsp;
+[**📸 Tour**](#-visual-tour) &nbsp;•&nbsp;
+[**🏗️ Architecture**](#️-architecture) &nbsp;•&nbsp;
+[**🚀 Quick Start**](#-quick-start) &nbsp;•&nbsp;
+[**🔑 Demo**](#-demo-credentials) &nbsp;•&nbsp;
+[**🧪 Testing**](#-validation--type-safety)
 
 </div>
 
 <br/>
 
-## 🎯 The Core Philosophy
+## 📖 What is Vidyut?
 
-Every year, millions of Indian students miss out on life-changing scholarships not because they aren't qualified, but because:
-1. **Fragmented Portals**: Finding scholarships requires sifting through hundreds of clunky state, central, and private websites.
-2. **Repetitive Uploads**: Applying to 10 scholarships forces students to re-upload their Aadhaar, Income Certificate, and Marksheets 10 separate times.
-3. **Broken Bureaucracy**: Confusing eligibility rules result in applications rejected months later for technicalities.
-4. **Zero Disbursement Transparency**: Once approved, students have no visibility into Direct Benefit Transfer (DBT) payment tranches.
+**Vidyut** is a high-trust scholarship **discovery, vaulting, and application platform** for Indian students.
 
-> **The Vidyut Promise:**  
-> *"Tell Vidyut about yourself once. Vidyut handles the repetitive scholarship work."*
+Students enter their details once, store verified documents in an encrypted vault, get matched against real eligibility rules, and apply to dozens of government and private scholarships in a single click. Administrators get a full review pipeline, from document verification to Direct Benefit Transfer (DBT) fund disbursement.
+
+<div align="center">
+
+| 🧑‍🎓 **One profile** | 🗄️ **One vault** | 🎯 **Real match scores** | 🖱️ **One-click apply** | 💸 **Transparent payouts** |
+|:---:|:---:|:---:|:---:|:---:|
+| Enter your details once | Upload each document once | 0–100% rule-based eligibility | Prefilled application wizard | Track every DBT tranche |
+
+</div>
 
 ---
 
-## ✨ Key Features
+## 🎯 Why Vidyut Exists
+
+Every year, millions of Indian students miss life-changing scholarships. Not because they're unqualified, but because the system is exhausting.
+
+| 😵 The Problem | 😌 The Vidyut Fix |
+|---|---|
+| **Fragmented portals.** Hundreds of clunky state, central, and private websites. | One discovery engine with live eligibility matching. |
+| **Repetitive uploads.** Aadhaar, income certificate, and marksheets re-uploaded 10 times. | Upload once to the vault; auto-link to every eligible application. |
+| **Broken bureaucracy.** Applications rejected months later over technicalities. | Eligibility rules checked *before* you apply. |
+| **Zero payout visibility.** No idea when, or whether, DBT money is coming. | A complete audit trail of tranches, bank reference codes, and dates. |
+
+> [!TIP]
+> **The Vidyut Promise:** *"Tell Vidyut about yourself once. Vidyut handles the repetitive scholarship work."*
+
+---
+
+## ✨ Features
 
 ### 👨‍🎓 For Students
 
-- **Vidyut Command Center**: A unified workspace surfacing profile match scores, active application pipelines, document vault health, and live treasury fund disbursements.
-- **Rule-Based Eligibility Matcher**: Evaluates family income thresholds, caste category, domicile state, gender, disability, minority status, and academic score cutoffs (percentage/CGPA) to calculate real 0–100% eligibility scores.
-- **Encrypted Document Vault**: Upload documents once with instant in-browser preview, graceful replacement conflict resolution, and automatic linking to eligible applications.
-- **4-Step Streamlined Wizard**: Prefilled candidate dossier → 1-click vault document linking → honesty declaration → instant tracking ID generation.
-- **Context-Aware AI Assistant**: A conversational assistant with access to the student's real profile, family income, and uploaded credentials that explains match requirements without hallucinations.
-- **Direct Benefit Transfer (DBT) Tracking**: Real-time audit trail of scholarship tranches, bank reference codes, and installment payment dates.
+| | Feature | What it does |
+|:-:|---|---|
+| 🚀 | **Command Center** | A unified workspace with profile match scores, active application pipelines, vault health, and live fund disbursements. |
+| 🎯 | **Eligibility Matcher** | Evaluates family income, caste category, domicile state, gender, disability, minority status, and academic cutoffs (percentage/CGPA) into a real **0–100%** score. |
+| 🔐 | **Encrypted Document Vault** | Upload once with instant in-browser preview, graceful replacement-conflict handling, and automatic linking to eligible applications. |
+| 🧭 | **4-Step Application Wizard** | Prefilled dossier → 1-click vault linking → honesty declaration → instant tracking ID. |
+| 🤖 | **Context-Aware AI Assistant** | Reads your real profile, family income, and uploaded credentials to explain match requirements without hallucinating. |
+| 💸 | **DBT Tracking** | Real-time audit trail of scholarship tranches, bank reference codes, and installment dates. |
 
-### 🏛️ For Scholarship Administrators & Reviewers
+### 🏛️ For Administrators & Reviewers
 
-- **Admin Operations Center**: Platform metrics for total registered students, active schemes, review backlogs, and pending verifications.
-- **Comprehensive Candidate Dossier**: Complete overview of student profile, family finances, and multi-tier academic history in a single unified view.
-- **Document Verification Queue**: Authenticated document streaming with one-click verification and mandatory rejection feedback rationale.
-- **Status Audit & Notes**: Complete chronological history timeline (`DRAFT` → `SUBMITTED` → `DOCUMENTS_VERIFIED` → `UNDER_REVIEW` → `APPROVED` / `REJECTED`).
-- **DBT Fund Disbursement Controls**: Record installment payments, transaction reference codes, and treasury advice slips directly into the candidate record.
+| | Feature | What it does |
+|:-:|---|---|
+| 📊 | **Operations Center** | Platform metrics: registered students, active schemes, review backlog, pending verifications. |
+| 🗂️ | **Candidate Dossier** | Profile, family finances, and multi-tier academic history in one unified view. |
+| ✅ | **Verification Queue** | Authenticated document streaming with one-click verify, and mandatory rationale on rejection. |
+| 🕓 | **Status Audit & Notes** | A complete chronological history of every status change, with reviewer notes. |
+| 🏦 | **DBT Disbursement Controls** | Record installments, transaction reference codes, and treasury advice slips directly on the candidate record. |
+
+### 🔄 Application Lifecycle
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> DRAFT
+    DRAFT --> SUBMITTED: Student submits
+    SUBMITTED --> DOCUMENTS_VERIFIED: Officer verifies docs
+    DOCUMENTS_VERIFIED --> UNDER_REVIEW: Review begins
+    UNDER_REVIEW --> APPROVED: Approved
+    UNDER_REVIEW --> REJECTED: Rejected
+    APPROVED --> [*]: DBT tranches disbursed
+    REJECTED --> [*]
+```
 
 ---
 
 ## 📸 Visual Tour
 
-### 1. High-Trust Landing Page
-*Clean, public-facing entry point outlining the 4-step workflow, live active scholarships, and instant demo access.*
+> Click any section to expand. Screenshots live in [`docs/screenshots/`](docs/screenshots).
+
+<details open>
+<summary><b>🧑‍🎓 Student Experience</b></summary>
+
+<br/>
+
+**1 · High-trust landing page** — the 4-step workflow, live active scholarships, and instant demo access.
 
 ![Vidyut Landing Page](docs/screenshots/01-landing-page.png)
 
----
-
-### 2. Student Command Center Dashboard
-*Command-center workspace presenting matched grants, active applications, DBT grant totals, and approaching deadlines.*
+**2 · Student Command Center** — matched grants, active applications, DBT totals, and approaching deadlines.
 
 ![Student Command Center](docs/screenshots/03-student-dashboard.png)
 
----
-
-### 3. Persistent Student Profile Dossier
-*Database-backed single source of truth with modular, in-place edit drawers for personal, family, and academic qualifications.*
+**3 · Persistent profile dossier** — a database-backed single source of truth with in-place edit drawers for personal, family, and academic details.
 
 ![Student Profile Dossier](docs/screenshots/04-student-profile.png)
 
----
-
-### 4. Encrypted Document Vault
-*Zero re-uploading vault displaying verification statuses, metadata, and live streaming document modals.*
+**4 · Encrypted document vault** — verification statuses, metadata, and live document preview modals. No re-uploading, ever.
 
 ![Document Vault](docs/screenshots/05-document-vault.png)
 
----
-
-### 5. Scholarship Discovery & Matching Engine
-*Dynamic filtering by category, level, and eligibility score with automatic rule evaluation.*
+**5 · Discovery & matching engine** — dynamic filtering by category, level, and eligibility score.
 
 ![Scholarship Discovery](docs/screenshots/06-scholarship-discovery.png)
 
----
+</details>
 
-### 6. Admin Control Center & Operations
-*Platform activity overview showing active schemes, pending review backlogs, and recent submissions.*
+<details open>
+<summary><b>🏛️ Admin Experience</b></summary>
+
+<br/>
+
+**6 · Admin control center** — active schemes, pending review backlog, and recent submissions at a glance.
 
 ![Admin Dashboard](docs/screenshots/08-admin-dashboard.png)
 
----
-
-### 7. Admin Application Review & Fund Disbursement (DBT)
-*Full candidate dossier, document inspection, reviewer notes, status transitions, and DBT disbursement tranches.*
+**7 · Application review & DBT disbursement** — full candidate dossier, document inspection, reviewer notes, status transitions, and payment tranches.
 
 ![Admin Application Review](docs/screenshots/10-admin-application-review.png)
 
----
-
-### 8. Document Verification Queue
-*Centralized verification pipeline allowing officers to preview certificates and verify or reject with feedback.*
+**8 · Document verification queue** — preview certificates, then verify or reject with feedback.
 
 ![Document Verification Queue](docs/screenshots/11-admin-documents-verification.png)
 
+</details>
+
 ---
 
-## 🏗️ Architecture & Tech Stack
+## 🏗️ Architecture
 
-Vidyut is built as a production-grade monorepo powered by **npm workspaces**:
+Vidyut is a monorepo managed with **npm workspaces**: a React SPA talking to a Hono REST API backed by PostgreSQL via Prisma.
 
-```
-vidyut/
-├── apps/
-│   ├── web/                     # Frontend Application (React 19 + Vite)
-│   │   ├── src/
-│   │   │   ├── api/             # Type-safe API client & error normalizer
-│   │   │   ├── components/      # UI components (Layouts, Vault Modals, Cards)
-│   │   │   ├── hooks/           # Custom React hooks (useApi, useDebounce)
-│   │   │   ├── pages/           # Public, Onboarding, Student, and Admin pages
-│   │   │   ├── store/           # Zustand stores (Auth, Notifications)
-│   │   │   └── styles/          # Government-grade light design tokens
-│   │   └── package.json
-│   │
-│   └── server/                  # Backend Application (Hono + Prisma + Node)
-│       ├── prisma/
-│       │   ├── schema.prisma    # Complete relational database schema (19 models)
-│       │   └── seed.ts          # Seed script with 23 scholarships & demo accounts
-│       ├── src/
-│       │   ├── lib/             # Prisma client, JWT, Bcrypt, Email services
-│       │   ├── middleware/      # JWT auth & role guards (Student, Admin, Reviewer)
-│       │   ├── routes/          # RESTful endpoints (Auth, Profile, Docs, AI, etc.)
-│       │   ├── services/        # Eligibility rule engine & progress calculators
-│       │   └── validators/      # Zod validation schemas
-│       └── package.json
-│
-├── docs/screenshots/            # High-resolution platform captures
-├── docker-compose.yml           # Isolated PostgreSQL 16 container definition
-└── package.json                 # Monorepo root scripts & workspaces
+```mermaid
+flowchart LR
+    subgraph Client["🖥️ apps/web · React 19 + Vite"]
+        UI[Pages & Components]
+        ST[Zustand Stores]
+        API[Type-safe API Client]
+        UI --> ST --> API
+    end
+
+    subgraph Server["⚙️ apps/server · Hono + Node"]
+        MW[JWT Auth & Role Guards]
+        RT[REST Routes]
+        SV[Eligibility Rule Engine]
+        MW --> RT --> SV
+    end
+
+    subgraph Data["🗄️ Data"]
+        PG[(PostgreSQL 16)]
+        FS[[Document Storage]]
+    end
+
+    API -- HTTPS / JSON --> MW
+    SV --> PG
+    RT --> PG
+    RT --> FS
 ```
 
-### Technology Highlights
+### 🔐 Role-Based Access
+
+| Role | Can do |
+|---|---|
+| **Student** | Manage profile, vault documents, discover & apply, track DBT payouts, chat with the assistant |
+| **Reviewer** | Verify/reject documents, review applications, add notes |
+| **Admin** | Everything a reviewer can, plus platform metrics and DBT fund disbursement |
+
+### 🧰 Tech Stack
 
 | Layer | Technologies |
 |---|---|
 | **Frontend** | React 19, TypeScript 5.6, Vite 5.4, Framer Motion, Lucide Icons, React Hook Form, Zod |
 | **Backend** | Hono v4, Node.js, `@hono/zod-validator`, Jose (JWT), Bcrypt.js, Slugify |
 | **Database** | PostgreSQL 16, Prisma ORM 5.22 (19 relational models, cascading relations) |
-| **Styling** | Vanilla CSS Design Tokens (Slate `#0f172a`, Trust Navy `#1e40af`, Emerald `#059669`) |
-| **DevOps** | Docker Compose, isolated port mapping (5433 to avoid native conflicts) |
+| **Styling** | Vanilla CSS design tokens: Slate `#0f172a`, Trust Navy `#1e40af`, Emerald `#059669` |
+| **DevOps** | Docker Compose, isolated Postgres port `5433` to avoid local conflicts |
+
+<details>
+<summary><b>📁 Project structure</b></summary>
+
+```text
+vidyut/
+├── apps/
+│   ├── web/                     # Frontend (React 19 + Vite)
+│   │   └── src/
+│   │       ├── api/             # Type-safe API client & error normalizer
+│   │       ├── components/      # Layouts, vault modals, cards
+│   │       ├── hooks/           # useApi, useDebounce
+│   │       ├── pages/           # Public, onboarding, student, admin
+│   │       ├── store/           # Zustand stores (auth, notifications)
+│   │       └── styles/          # Government-grade light design tokens
+│   │
+│   └── server/                  # Backend (Hono + Prisma + Node)
+│       ├── prisma/
+│       │   ├── schema.prisma    # Relational schema (19 models)
+│       │   └── seed.ts          # 23 scholarships & demo accounts
+│       └── src/
+│           ├── lib/             # Prisma client, JWT, Bcrypt, email
+│           ├── middleware/      # JWT auth & role guards
+│           ├── routes/          # Auth, profile, docs, AI, and more
+│           ├── services/        # Eligibility engine & progress calculators
+│           └── validators/      # Zod schemas
+│
+├── docs/screenshots/            # Platform captures
+├── docker-compose.yml           # PostgreSQL 16 container
+└── package.json                 # Monorepo root scripts & workspaces
+```
+
+</details>
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v20 or higher recommended)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for PostgreSQL)
+| Tool | Version |
+|---|---|
+| [Node.js](https://nodejs.org/) | v20+ |
+| [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Any recent version (for PostgreSQL) |
 
----
-
-### Step 1: Clone the Repository
+### 1️⃣ Clone
 
 ```bash
 git clone https://github.com/vedantgrd/vidyut.git
 cd vidyut
 ```
 
-### Step 2: Start PostgreSQL Database
-
-Run PostgreSQL via Docker Compose:
+### 2️⃣ Start PostgreSQL
 
 ```bash
 docker compose up -d
 ```
-*(Runs PostgreSQL 16 on port `5433` to prevent collisions with existing local PostgreSQL installations).*
 
-### Step 3: Install Dependencies
+> Runs Postgres 16 on port **5433**, so it won't collide with a local Postgres install.
 
-Install all root, web, and server dependencies in one command:
+### 3️⃣ Install dependencies
 
 ```bash
 npm install
 ```
 
-### Step 4: Configure Environment Variables
+### 4️⃣ Configure environment
 
-Create `.env` file for the backend:
+Create `apps/server/.env`:
 
-```bash
-# In apps/server/.env
+```env
 DATABASE_URL="postgresql://vidyut:vidyut_password@localhost:5433/vidyut_db"
-JWT_ACCESS_SECRET="MumxNGhRMHHLxTd63ToVdDM9UxzOoSkZa6hyl+VI5hJNM29Nt4QDo0kBn/Vc6viO"
-JWT_REFRESH_SECRET="4IfBFB1weKew//0yO7yTRDdDSJlwxOug8mGW0TdY7wWc5to6nipL5xQAdKYmU34v"
+
+# Generate your own secrets (see below). Never commit real values.
+JWT_ACCESS_SECRET="<paste-a-random-secret>"
+JWT_REFRESH_SECRET="<paste-a-different-random-secret>"
 JWT_ACCESS_EXPIRY="15m"
 JWT_REFRESH_EXPIRY="7d"
+
 PORT=3001
 NODE_ENV="development"
 FRONTEND_URL="http://localhost:5173"
 STORAGE_PATH="./uploads"
 ```
 
-### Step 5: Initialize Database & Seed
+Generate two strong, distinct secrets:
 
-Generate the Prisma Client and populate scholarships, rules, and demo accounts:
+```bash
+openssl rand -base64 48
+```
+
+> [!WARNING]
+> Use a **different** secret for access and refresh tokens, and never reuse development secrets in production.
+
+### 5️⃣ Initialize & seed the database
 
 ```bash
 cd apps/server
@@ -223,49 +306,97 @@ npm run db:seed
 cd ../..
 ```
 
-### Step 6: Start Development Servers
-
-Run both the backend API and frontend Vite server concurrently:
+### 6️⃣ Run everything
 
 ```bash
 npm run dev
 ```
 
-- **Frontend Application**: [`http://localhost:5173`](http://localhost:5173)
-- **Backend API**: [`http://localhost:3001`](http://localhost:3001)
+| Service | URL |
+|---|---|
+| 🖥️ **Frontend** | http://localhost:5173 |
+| ⚙️ **Backend API** | http://localhost:3001 |
 
 ---
 
 ## 🔑 Demo Credentials
 
-For rapid evaluation and testing, Vidyut includes pre-seeded accounts accessible directly via the **Quick Demo Access** card on the login page:
+Pre-seeded accounts are available via the **Quick Demo Access** card on the login page.
 
-| Role | Email | Password | Pre-seeded Context |
+| Role | Email | Password | Pre-seeded context |
 |---|---|---|---|
-| **Student** | `demo@vidyut.in` | `Demo@1234` | Arjun Sharma (Class 12, OBC, 82.5%, Income ₹2.5L, Maharashtra, 1 Approved Grant) |
-| **Admin** | `admin@vidyut.in` | `Admin@1234` | Vidyut Directorate Administrator (Review queue, DBT disburser, verification permissions) |
+| 🧑‍🎓 **Student** | `demo@vidyut.in` | `Demo@1234` | Arjun Sharma · Class 12 · OBC · 82.5% · Income ₹2.5L · Maharashtra · 1 approved grant |
+| 🏛️ **Admin** | `admin@vidyut.in` | `Admin@1234` | Vidyut Directorate Administrator · review queue, DBT disbursement, verification rights |
+
+> [!CAUTION]
+> These are **demo-only** credentials. Remove or change them before any real deployment.
 
 ---
 
 ## 🧪 Validation & Type Safety
 
-Vidyut enforces strict end-to-end type safety:
-
 ```bash
-# Run TypeScript compilation checks across all packages
+# TypeScript compilation checks across all packages
 npm run typecheck --workspaces
 
 # Verify database state & seeded records
 cd apps/server && npx tsx verify-db.ts
 
-# Run simulated end-to-end application lifecycle
+# Simulated end-to-end application lifecycle
 cd apps/server && npx tsx test-e2e.ts
 ```
 
 ---
 
-<br/>
+## 🩺 Troubleshooting
+
+<details>
+<summary><b>Port 5433 is already in use</b></summary>
+
+Change the host port mapping in `docker-compose.yml`, then update the port in `DATABASE_URL` to match.
+
+</details>
+
+<details>
+<summary><b>Prisma can't connect to the database</b></summary>
+
+Confirm the container is healthy with `docker compose ps`, and that `DATABASE_URL` in `apps/server/.env` uses port `5433`.
+
+</details>
+
+<details>
+<summary><b>Seed data looks wrong or stale</b></summary>
+
+Reset and reseed from `apps/server`:
+
+```bash
+npx prisma migrate reset
+npm run db:seed
+```
+
+</details>
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the repo
+2. Create a branch: `git checkout -b feat/your-idea`
+3. Run `npm run typecheck --workspaces` before committing
+4. Open a pull request describing what and why
+
+---
 
 <div align="center">
-  <sub>Built with ❤️ for every student navigating higher education funding.</sub>
+
+<sub>Built with ❤️ for every student navigating higher education funding.</sub>
+
+<br/>
+
+⭐ **If Vidyut saved you a form or two, consider starring the repo.** ⭐
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:059669,100:1e40af&height=100&section=footer" alt="footer" width="100%"/>
+
 </div>
