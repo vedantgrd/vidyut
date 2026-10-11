@@ -15,7 +15,7 @@
 
 **Vidyut** is an intelligent, high-trust scholarship discovery, vaulting, and application platform. It eliminates the repetitive paperwork headache by allowing students to enter their credentials once, store verified documents in an encrypted vault, match against complex eligibility criteria, and apply to dozens of verified government and private scholarships with 1 click.
 
-[Live Demo](http://localhost:5173) • [Core Philosophy](#-the-core-philosophy) • [Key Features](#-key-features) • [Visual Tour](#-visual-tour) • [Architecture](#-architecture) • [Getting Started](#-getting-started) • [Demo Credentials](#-demo-credentials)
+• [Core Philosophy](#-the-core-philosophy) • [Key Features](#-key-features) • [Visual Tour](#-visual-tour) • [Architecture](#-architecture) • [Getting Started](#-getting-started) • [Demo Credentials](#-demo-credentials)
 
 ---
 
@@ -263,10 +263,6 @@ cd apps/server && npx tsx test-e2e.ts
 ```
 
 ---
-
-## 📄 License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 <br/>
 
