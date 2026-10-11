@@ -1,0 +1,42 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: var(--surface-1);
+  overflow-x: hidden;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.main:focus {
+  outline: none; /* Focus outline removed for programmatic focus, relies on visual layout */
+}
+
+/* Accessibility: Hidden until focused */
+.skipLink {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--brand-magic-start);
+  color: white;
+  padding: var(--space-sm) var(--space-md);
+  z-index: 1000;
+  transition: top var(--duration-fast) var(--motion-spring);
+  font-weight: 500;
+  border-radius: 0 0 var(--radius-md) 0;
+}
+
+.skipLink:focus {
+  top: 0;
+}
+
+.header, .footer {
+  /* Scaffolded for future use */
+  width: 100%;
+}

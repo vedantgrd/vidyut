@@ -1,0 +1,73 @@
+.banner {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xl);
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.icon {
+  color: var(--brand-magic-start);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.title {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: var(--text-md);
+  margin-bottom: 2px;
+}
+
+.description {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+.description strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.resendBtn {
+  font-size: var(--text-xs);
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.dismissBtn {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast) ease;
+}
+
+.dismissBtn:hover {
+  background: var(--surface-3);
+  color: var(--text-primary);
+}

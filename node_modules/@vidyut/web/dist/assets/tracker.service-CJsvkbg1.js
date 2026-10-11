@@ -1,0 +1,1 @@
+import{F as e,G as a}from"./index-DpQGEyCZ.js";const n={async fetchApplications(){return e.get(a.TRACKER.APPLICATIONS)},async createApplication(t,c){return e.post(a.TRACKER.CREATE,{scholarshipId:t,notes:c})},async updateStatus(t,c,r){return e.patch(a.TRACKER.UPDATE_STATUS(t),{status:c,notes:r})},async deleteApplication(t){await e.delete(a.TRACKER.DELETE(t))}};export{n as t};

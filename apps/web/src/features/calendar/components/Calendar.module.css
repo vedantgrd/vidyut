@@ -1,0 +1,105 @@
+.gridContainer {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.weekDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.weekDay {
+  padding: var(--space-md);
+  text-align: center;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.daysGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(120px, auto);
+}
+
+.dayCell {
+  padding: var(--space-sm);
+  border-right: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color var(--duration-fast) ease;
+}
+
+.dayCell:nth-child(7n) {
+  border-right: none;
+}
+
+.dayCell:hover {
+  background: var(--surface-2);
+}
+
+.disabledDay {
+  background: var(--surface-2);
+  opacity: 0.5;
+}
+
+.today {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.today .dayNumber {
+  background: var(--brand-magic-start);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dayNumber {
+  font-weight: 500;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+  display: inline-flex;
+}
+
+.eventList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eventBadge {
+  font-size: 11px;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.eventBadge[data-type="deadline"] {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.eventBadge[data-type="interview"] {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+}
+
+.eventBadge[data-type="reminder"] {
+  background: rgba(234, 179, 8, 0.1);
+  color: #eab308;
+}

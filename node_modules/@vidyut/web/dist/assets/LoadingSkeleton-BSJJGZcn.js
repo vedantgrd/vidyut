@@ -1,0 +1,1 @@
+import{q as l,J as o}from"./index-DpQGEyCZ.js";const d=({className:e,variant:r="rect"})=>{const s="bg-[var(--surface-3)] animate-pulse border border-[var(--border-subtle)]",t={text:"h-4 w-full rounded-md",title:"h-6 w-2/3 rounded-lg",circle:"rounded-full shrink-0",rect:"h-32 w-full rounded-2xl"};return l.jsx("div",{className:o(s,t[r],e)})};export{d as L};

@@ -1,0 +1,80 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: var(--surface-1);
+}
+
+.brandPanel {
+  display: none;
+}
+
+.formPanel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+}
+
+.formContainer {
+  width: 100%;
+  max-width: 440px;
+}
+
+@media (min-width: 1024px) {
+  .brandPanel {
+    flex: 1;
+    position: relative; /* Anchor for background layer */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--space-4xl);
+    border-right: 1px solid var(--border-subtle);
+    overflow: hidden;
+  }
+
+  .brandBackgroundLayer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%);
+    z-index: 0;
+  }
+
+  .brandContent {
+    position: relative;
+    z-index: 1;
+  }
+
+  .brandOrbWrapper {
+    margin-bottom: var(--space-xl);
+  }
+
+  .brandMagicOrb {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-magic-start) 0%, var(--brand-magic-end) 100%);
+    box-shadow: 0 0 32px rgba(99, 102, 241, 0.4);
+    margin-bottom: var(--space-xl);
+  }
+
+  .brandName {
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    color: var(--text-primary);
+    margin-bottom: var(--space-md);
+  }
+
+  .brandTagline {
+    font-size: var(--text-h3);
+    color: var(--text-secondary);
+    max-width: 480px;
+    line-height: var(--leading-snug);
+  }
+
+  .formPanel {
+    flex: 1;
+    background-color: var(--surface-1);
+  }
+}

@@ -1,0 +1,83 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.header {
+  margin-bottom: var(--space-2xl);
+  text-align: center;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.errorAlert {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xl);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.forgotLink {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: var(--text-sm);
+  color: var(--brand-magic-start);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity var(--duration-fast) ease;
+}
+
+.forgotLink:hover {
+  opacity: 0.8;
+}
+
+.submitBtn {
+  width: 100%;
+  margin-bottom: var(--space-xl);
+}
+
+.footerText {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.link {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

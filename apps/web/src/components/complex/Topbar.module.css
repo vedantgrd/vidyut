@@ -1,0 +1,95 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-xl);
+  z-index: 40;
+  
+  /* Glassmorphism background for the header */
+  background: var(--glass-surface);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.left, .right {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.right {
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
+
+.center {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+}
+
+.searchButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: 480px;
+  height: 40px;
+  padding: 0 var(--space-md);
+  background-color: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-tertiary);
+  transition: all var(--duration-fast) var(--motion-spring);
+}
+
+.searchButton:hover {
+  background-color: var(--surface-3);
+  border-color: var(--border-strong);
+  color: var(--text-secondary);
+}
+
+.searchIcon {
+  flex-shrink: 0;
+}
+
+.placeholder {
+  flex: 1;
+  text-align: left;
+  font-size: var(--text-body-base);
+}
+
+.shortcut {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  background-color: var(--surface-1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  letter-spacing: 0.5px;
+}
+
+.iconButton {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  padding: 0; /* Override default button padding to make it perfectly square */
+}
+
+.notificationDot {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  background-color: var(--status-error);
+  border-radius: 50%;
+  border: 2px solid var(--surface-1);
+}

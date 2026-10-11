@@ -1,0 +1,37 @@
+.main {
+  padding: var(--space-2xl);
+  text-align: center;
+}
+
+.subtitle {
+  margin-top: var(--space-md);
+}
+
+.card {
+  margin-top: var(--space-xl);
+  padding: var(--space-xl);
+  max-width: 400px;
+  margin-inline: auto;
+}
+
+.cardDescription {
+  margin-top: var(--space-sm);
+}
+
+.placeholderPage {
+  padding: var(--space-md);
+}
+
+.placeholderSubtitle {
+  color: var(--text-secondary);
+  margin-top: var(--space-md);
+}
+
+.notFoundPage {
+  padding: var(--space-2xl);
+  text-align: center;
+}
+
+.actionContainer {
+  margin-top: var(--space-xl);
+}

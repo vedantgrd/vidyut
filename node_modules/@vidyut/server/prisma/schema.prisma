@@ -1,0 +1,527 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  STUDENT
+  ADMIN
+  REVIEWER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum Category {
+  GENERAL
+  OBC
+  SC
+  ST
+  EWS
+  OTHER
+}
+
+enum EducationLevel {
+  CLASS_10
+  CLASS_12
+  DIPLOMA
+  UNDERGRADUATE
+  POSTGRADUATE
+  DOCTORATE
+  OTHER
+}
+
+enum DocumentType {
+  AADHAAR
+  PAN
+  INCOME_CERTIFICATE
+  CASTE_CERTIFICATE
+  DOMICILE_CERTIFICATE
+  TENTH_MARKSHEET
+  TWELFTH_MARKSHEET
+  DIPLOMA_MARKSHEET
+  DEGREE_CERTIFICATE
+  TRANSCRIPT
+  DISABILITY_CERTIFICATE
+  BANK_PASSBOOK
+  PHOTOGRAPH
+  COLLEGE_ID
+  BONAFIDE_CERTIFICATE
+  ADMISSION_PROOF
+  FEE_RECEIPT
+  OTHER
+}
+
+enum DocumentStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+enum ScholarshipCategory {
+  GOVERNMENT
+  PRIVATE
+  NGO
+  INTERNATIONAL
+  MINORITY
+  MERIT
+  NEED_BASED
+  SPORTS
+  RESEARCH
+  STARTUP
+  STUDY_ABROAD
+}
+
+enum ScholarshipStatus {
+  ACTIVE
+  CLOSED
+  UPCOMING
+  PAUSED
+}
+
+enum RuleType {
+  INCOME_MAX
+  INCOME_MIN
+  CATEGORY
+  EDUCATION_LEVEL
+  MIN_PERCENTAGE
+  MIN_CGPA
+  STATE
+  GENDER
+  AGE_MIN
+  AGE_MAX
+  DISABILITY
+  MINORITY
+  RELIGION
+}
+
+enum RuleOperator {
+  EQUALS
+  NOT_EQUALS
+  LESS_THAN_OR_EQUAL
+  GREATER_THAN_OR_EQUAL
+  IN
+  NOT_IN
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  DOCUMENTS_VERIFIED
+  UNDER_REVIEW
+  ADDITIONAL_INFO_REQUESTED
+  APPROVED
+  REJECTED
+  WITHDRAWN
+}
+
+enum DisbursementStatus {
+  NOT_APPLICABLE
+  PENDING
+  DISBURSED
+  FAILED
+}
+
+enum PaymentType {
+  ONE_TIME
+  INSTALLMENTS
+  VARIABLE
+}
+
+enum NotificationType {
+  SYSTEM
+  APPLICATION_SUBMITTED
+  APPLICATION_STATUS_CHANGED
+  DOCUMENT_VERIFIED
+  DOCUMENT_REJECTED
+  DEADLINE_REMINDER
+  NEW_ELIGIBLE_SCHOLARSHIP
+  REVIEWER_COMMENT
+  ANNOUNCEMENT
+}
+
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  passwordHash String
+  fullName String
+  role UserRole @default(STUDENT)
+  isEmailVerified Boolean @default(false)
+  emailVerifyToken String?
+  emailVerifyExpiry DateTime?
+  resetToken String?
+  resetTokenExpiry DateTime?
+  avatarUrl String?
+  onboardingComplete Boolean @default(false)
+  onboardingStep Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastLoginAt DateTime?
+
+  studentProfile StudentProfile?
+  familyInfo FamilyInfo?
+  academicRecords AcademicRecord[]
+  documents Document[]
+  applications Application[]
+  notifications Notification[]
+  sessions Session[]
+  settings UserSettings?
+  auditLogs AuditLog[]
+
+  createdScholarships Scholarship[] @relation("ScholarshipCreatedBy")
+  verifiedDocuments Document[] @relation("DocumentVerifiedBy")
+  reviewedApplications Application[] @relation("ApplicationReviewedBy")
+  statusChangesMade ApplicationStatusHistory[] @relation("StatusChangedBy")
+
+  @@index([email])
+  @@index([role])
+}
+
+model Session {
+  id String @id @default(cuid())
+  userId String
+  refreshTokenHash String @unique
+  userAgent String?
+  ipAddress String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model UserSettings {
+  id String @id @default(cuid())
+  userId String @unique
+  emailDeadlineReminders Boolean @default(true)
+  emailApplicationUpdates Boolean @default(true)
+  emailNewMatches Boolean @default(true)
+  pushNotifications Boolean @default(true)
+  language String @default("en")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model StudentProfile {
+  id String @id @default(cuid())
+  userId String @unique
+  dateOfBirth DateTime?
+  gender Gender?
+  phone String?
+  religion String?
+  category Category?
+  isMinority Boolean?
+  hasDisability Boolean?
+  disabilityDetails String?
+  domicileState String?
+  nationality String? @default("Indian")
+  addressLine1 String?
+  addressLine2 String?
+  city String?
+  state String?
+  pincode String?
+  skills String[]
+  achievements String[]
+  extracurriculars String[]
+  languages String[]
+  careerGoals String?
+  bio String?
+  isStepComplete Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model FamilyInfo {
+  id String @id @default(cuid())
+  userId String @unique
+  fatherName String?
+  fatherOccupation String?
+  fatherIncome Int?
+  motherName String?
+  motherOccupation String?
+  motherIncome Int?
+  guardianName String?
+  annualFamilyIncome Int?
+  isBPL Boolean? @default(false)
+  numberOfDependents Int?
+  isStepComplete Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AcademicRecord {
+  id String @id @default(cuid())
+  userId String
+  level EducationLevel
+  institutionName String?
+  boardOrUniversity String?
+  courseName String?
+  branch String?
+  marksObtained Float?
+  totalMarks Float?
+  percentage Float?
+  cgpa Float?
+  maxCgpa Float? @default(10)
+  passingYear Int?
+  admissionYear Int?
+  currentSemester Int?
+  isCurrentlyPursuing Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, level])
+  @@index([userId])
+}
+
+model Document {
+  id String @id @default(cuid())
+  userId String
+  type DocumentType
+  label String
+  fileName String
+  filePath String
+  fileSize Int
+  mimeType String
+  status DocumentStatus @default(PENDING)
+  rejectionReason String?
+  expiryDate DateTime?
+  verifiedByAdminId String?
+  verifiedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verifiedByAdmin User? @relation("DocumentVerifiedBy", fields: [verifiedByAdminId], references: [id])
+  applicationLinks ApplicationDocument[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Scholarship {
+  id String @id @default(cuid())
+  slug String @unique
+  name String
+  provider String
+  description String @db.Text
+  shortDescription String?
+  amount Int
+  amountDescription String?
+  scholarshipCategory ScholarshipCategory
+  tags String[]
+  isFeatured Boolean @default(false)
+  isNational Boolean @default(true)
+  states String[]
+  deadline DateTime
+  openDate DateTime?
+  closingDate DateTime?
+  officialWebsite String?
+  applicationUrl String?
+  paymentType PaymentType @default(ONE_TIME)
+  status ScholarshipStatus @default(ACTIVE)
+  createdByAdminId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdByAdmin User? @relation("ScholarshipCreatedBy", fields: [createdByAdminId], references: [id])
+  eligibilityRules EligibilityRule[]
+  requiredDocuments RequiredDocument[]
+  installments ScholarshipInstallment[]
+  applications Application[]
+
+  @@index([status])
+  @@index([deadline])
+  @@index([scholarshipCategory])
+  @@index([isFeatured])
+}
+
+model EligibilityRule {
+  id String @id @default(cuid())
+  scholarshipId String
+  ruleType RuleType
+  operator RuleOperator
+  value Json
+  isRequired Boolean @default(true)
+  description String?
+  createdAt DateTime @default(now())
+
+  scholarship Scholarship @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+
+  @@index([scholarshipId])
+}
+
+model RequiredDocument {
+  id String @id @default(cuid())
+  scholarshipId String
+  documentType DocumentType
+  label String
+  description String?
+  isOptional Boolean @default(false)
+
+  scholarship Scholarship @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+
+  @@unique([scholarshipId, documentType])
+  @@index([scholarshipId])
+}
+
+model Application {
+  id String @id @default(cuid())
+  userId String
+  scholarshipId String
+  status ApplicationStatus @default(DRAFT)
+  submittedAt DateTime?
+  reviewedAt DateTime?
+  decidedAt DateTime?
+  reviewerNotes String? @db.Text
+  rejectionReason String? @db.Text
+  reviewedByAdminId String?
+  disbursementStatus DisbursementStatus @default(NOT_APPLICABLE)
+  disbursementDate DateTime?
+  disbursedAmount Int?
+  completionPercent Int @default(0)
+  lastActivityAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scholarship Scholarship @relation(fields: [scholarshipId], references: [id])
+  reviewedByAdmin User? @relation("ApplicationReviewedBy", fields: [reviewedByAdminId], references: [id])
+  formData ApplicationFormData[]
+  documents ApplicationDocument[]
+  disbursements ApplicationDisbursement[]
+  statusHistory ApplicationStatusHistory[]
+
+  @@unique([userId, scholarshipId])
+  @@index([userId])
+  @@index([scholarshipId])
+  @@index([status])
+}
+
+model ApplicationFormData {
+  id String @id @default(cuid())
+  applicationId String
+  fieldName String
+  fieldLabel String
+  fieldValue String @db.Text
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, fieldName])
+  @@index([applicationId])
+}
+
+model ApplicationDocument {
+  id String @id @default(cuid())
+  applicationId String
+  documentId String
+  requiredDocumentId String
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  document Document @relation(fields: [documentId], references: [id])
+
+  @@unique([applicationId, requiredDocumentId])
+  @@index([applicationId])
+}
+
+model ApplicationStatusHistory {
+  id String @id @default(cuid())
+  applicationId String
+  fromStatus ApplicationStatus?
+  toStatus ApplicationStatus
+  changedByUserId String?
+  note String? @db.Text
+  changedAt DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  changedByUser User? @relation("StatusChangedBy", fields: [changedByUserId], references: [id])
+
+  @@index([applicationId])
+}
+
+model Notification {
+  id String @id @default(cuid())
+  userId String
+  type NotificationType
+  title String
+  message String
+  isRead Boolean @default(false)
+  link String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model AuditLog {
+  id String @id @default(cuid())
+  userId String?
+  action String
+  entity String?
+  entityId String?
+  metadata Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model ScholarshipInstallment {
+  id String @id @default(cuid())
+  scholarshipId String
+  installmentNo Int
+  name String?
+  amount Int
+  description String?
+  expectedDate DateTime?
+  createdAt DateTime @default(now())
+
+  scholarship Scholarship @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+  disbursements ApplicationDisbursement[]
+
+  @@unique([scholarshipId, installmentNo])
+  @@index([scholarshipId])
+}
+
+model ApplicationDisbursement {
+  id String @id @default(cuid())
+  applicationId String
+  installmentId String?
+  installmentNo Int?
+  amount Int
+  status DisbursementStatus @default(PENDING)
+  referenceCode String?
+  notes String?
+  disbursedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  installment ScholarshipInstallment? @relation(fields: [installmentId], references: [id])
+
+  @@index([applicationId])
+  @@index([status])
+}

@@ -1,0 +1,18 @@
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.socialBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  background-color: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+}
+
+.socialBtn:hover {
+  background-color: var(--surface-3);
+}

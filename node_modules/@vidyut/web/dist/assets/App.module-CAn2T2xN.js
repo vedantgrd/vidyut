@@ -1,0 +1,1 @@
+const e="_placeholderPage_sk2sz_21",o="_placeholderSubtitle_sk2sz_25",t="_notFoundPage_sk2sz_30",n="_actionContainer_sk2sz_35",a={placeholderPage:e,placeholderSubtitle:o,notFoundPage:t,actionContainer:n};export{a as s};
