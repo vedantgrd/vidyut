@@ -39,7 +39,9 @@ app.use('*', cors({
   credentials: true
 }))
 app.get('/health',c=>c.json({status:'ok',timestamp:new Date().toISOString()}))
+app.get('/',c=>c.json({name:'Vidyut API',status:'online',version:'1.0.0',health:'/health',api:'/api/v1'}))
 const api=new Hono()
+api.get('/',c=>c.json({name:'Vidyut API v1',status:'online',endpoints:['/auth','/scholarships','/applications','/documents','/profile','/dashboard','/admin']}))
 api.route('/auth',authRoutes);api.route('/onboarding',onboardingRoutes);api.route('/profile',profileRoutes)
 api.route('/documents',documentRoutes);api.route('/scholarships',scholarshipRoutes);api.route('/applications',applicationRoutes)
 api.route('/dashboard',dashboardRoutes);api.route('/notifications',notificationRoutes);api.route('/settings',settingsRoutes)
