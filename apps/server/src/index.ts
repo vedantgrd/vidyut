@@ -14,7 +14,13 @@ import notificationRoutes from'./routes/notifications.js'
 import settingsRoutes from'./routes/settings.js'
 import aiRoutes from'./routes/ai.js'
 import adminRoutes from'./routes/admin.js'
+import { ensureStorageSeedPopulated } from './services/storageService.js'
+
 for(const k of['DATABASE_URL','JWT_ACCESS_SECRET','JWT_REFRESH_SECRET']){if(!process.env[k]){console.error(`Missing env: ${k}`);process.exit(1)}}
+
+// Automatically synchronize seed documents to local storage on container boot (e.g. Render)
+ensureStorageSeedPopulated()
+
 const app=new Hono()
 app.use('*',logger())
 app.use('*',secureHeaders())
