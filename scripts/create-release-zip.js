@@ -33,6 +33,7 @@ const itemsToCopy = [
   'apps/web/tsconfig.node.json',
   'apps/web/vite.config.ts',
   'apps/web/index.html',
+  'apps/web/vercel.json',
   'apps/web/.env.example',
   'docs',
   'scripts',

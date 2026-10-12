@@ -3,15 +3,13 @@ import{zValidator}from'@hono/zod-validator'
 import{prisma}from'../lib/prisma.js'
 import{authMiddleware,adminMiddleware}from'../middleware/auth.js'
 import{documentTypeEnum,verifyDocumentSchema}from'../validators/schemas.js'
-import{mkdir,writeFile,readFile}from'node:fs/promises'
-import{join,extname,resolve}from'node:path'
-import{existsSync}from'node:fs'
+import{extname}from'node:path'
 import crypto from'node:crypto'
+import{storageService}from'../services/storageService.js'
 
 const documents=new Hono<{Variables:{userId:string;role:string}}>()
 documents.use('*',authMiddleware)
 
-const STORAGE=process.env.STORAGE_PATH??'./uploads'
 const ALLOWED=['image/jpeg','image/png','application/pdf','image/webp']
 const MAX=5*1024*1024
 
@@ -25,17 +23,14 @@ documents.get('/:id/file',async(c)=>{
   if(!doc)return c.json({error:'Document not found'},404)
   if(doc.userId!==userId && role!=='ADMIN' && role!=='REVIEWER')return c.json({error:'Forbidden'},403)
 
-  const resolvedBase=resolve(STORAGE)
-  const fullPath=resolve(STORAGE,doc.filePath.replace(/^\//,''))
-  if(!fullPath.startsWith(resolvedBase))return c.json({error:'Invalid file path'},400)
-  if(!existsSync(fullPath))return c.json({error:'File not found on server disk'},404)
-
   try{
-    const fileBuffer=await readFile(fullPath)
+    const fileBuffer=await storageService.getFile(doc.filePath)
     c.header('Content-Type',doc.mimeType)
     c.header('Content-Disposition',`inline; filename="${encodeURIComponent(doc.fileName)}"`)
-    return c.body(fileBuffer)
-  }catch(e){
+    return c.body(fileBuffer as any)
+  }catch(e: any){
+    if(e?.message==='FILE_NOT_FOUND')return c.json({error:'File not found on storage'},404)
+    if(e?.message?.includes('INVALID_PATH'))return c.json({error:'Invalid file path'},400)
     console.error('File read error:',e)
     return c.json({error:'Could not read file'},500)
   }
@@ -68,16 +63,15 @@ documents.post('/upload',async(c)=>{
 
   const ext=extname(file.name)||'.pdf'
   const filename=`${userId}-${crypto.randomBytes(8).toString('hex')}${ext}`
-  const userDir=join(STORAGE,userId)
+  let filePath: string
   try{
-    await mkdir(userDir,{recursive:true})
-    await writeFile(join(userDir,filename),Buffer.from(await file.arrayBuffer()))
+    const buffer=Buffer.from(await file.arrayBuffer())
+    filePath=await storageService.saveFile(userId,filename,buffer,file.type)
   }catch(err){
     console.error('File write:',err)
     return c.json({error:'Failed to save file'},500)
   }
 
-  const filePath=`/${userId}/${filename}`
   if(existing && replaceExisting){
     // Update existing document record so foreign keys in ApplicationDocument remain valid!
     const updated=await prisma.document.update({
@@ -122,6 +116,7 @@ documents.delete('/:id',async(c)=>{
     // Remove links to applications first so delete doesn't violate foreign key constraints
     await prisma.applicationDocument.deleteMany({where:{documentId:id}})
   }
+  await storageService.deleteFile(doc.filePath).catch(()=>{})
   await prisma.document.delete({where:{id}})
   return c.json({message:'Deleted'})
 })

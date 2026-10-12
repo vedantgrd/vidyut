@@ -10,7 +10,10 @@ import{authMiddleware}from'../middleware/auth.js'
 import{signupSchema,loginSchema,forgotPasswordSchema,resetPasswordSchema,verifyEmailSchema}from'../validators/schemas.js'
 const auth=new Hono<{Variables:{userId:string;role:string}}>()
 const CK='refresh_token'
-const CO={httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'Strict' as const,path:'/',maxAge:604800}
+const isProd = process.env.NODE_ENV === 'production'
+const sameSiteEnv = process.env.COOKIE_SAME_SITE?.toLowerCase()
+const sameSiteVal = (sameSiteEnv === 'none' ? 'None' : sameSiteEnv === 'lax' ? 'Lax' : sameSiteEnv === 'strict' ? 'Strict' : (isProd ? 'None' : 'Lax')) as 'Strict' | 'Lax' | 'None'
+const CO = { httpOnly: true, secure: isProd, sameSite: sameSiteVal, path: '/', maxAge: 604800 }
 const H=(t:string)=>crypto.createHash('sha256').update(t).digest('hex')
 function safe(u:{id:string;email:string;fullName:string;role:string;isEmailVerified:boolean;onboardingComplete:boolean;onboardingStep:number;avatarUrl:string|null;createdAt:Date}){return{id:u.id,email:u.email,fullName:u.fullName,role:u.role,isEmailVerified:u.isEmailVerified,onboardingComplete:u.onboardingComplete,onboardingStep:u.onboardingStep,avatarUrl:u.avatarUrl,createdAt:u.createdAt}}
 auth.post('/signup',zValidator('json',signupSchema),async(c)=>{

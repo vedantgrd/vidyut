@@ -18,7 +18,26 @@ for(const k of['DATABASE_URL','JWT_ACCESS_SECRET','JWT_REFRESH_SECRET']){if(!pro
 const app=new Hono()
 app.use('*',logger())
 app.use('*',secureHeaders())
-app.use('*',cors({origin:process.env.FRONTEND_URL??'http://localhost:5173',allowMethods:['GET','POST','PUT','PATCH','DELETE','OPTIONS'],allowHeaders:['Content-Type','Authorization'],credentials:true}))
+const allowedOrigins = (process.env.FRONTEND_URL ?? 'http://localhost:5173')
+  .split(',')
+  .map(o => o.trim().replace(/\/+$/, ''))
+  .filter(Boolean)
+
+app.use('*', cors({
+  origin: (origin) => {
+    if (!origin) return allowedOrigins[0] ?? 'http://localhost:5173'
+    const normalized = origin.replace(/\/+$/, '')
+    if (allowedOrigins.includes(normalized)) return origin
+    // Check if localhost in development
+    if (process.env.NODE_ENV !== 'production' && /^http:\/\/localhost(:\d+)?$/.test(normalized)) {
+      return origin
+    }
+    return null
+  },
+  allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}))
 app.get('/health',c=>c.json({status:'ok',timestamp:new Date().toISOString()}))
 const api=new Hono()
 api.route('/auth',authRoutes);api.route('/onboarding',onboardingRoutes);api.route('/profile',profileRoutes)
