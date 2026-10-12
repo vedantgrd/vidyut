@@ -1,6 +1,6 @@
 import { prisma } from './src/lib/prisma.js'
 
-const API_BASE = 'http://localhost:3001/api/v1'
+const API_BASE = (process.env.API_BASE_URL || process.env.LIVE_API_URL || 'http://localhost:3001/api/v1').replace(/\/+$/, '')
 
 interface TestResult {
   step: string
@@ -541,28 +541,31 @@ async function run() {
     console.log('======================================================\n')
   } finally {
     // Teardown test accounts cleanly
-    console.log('Cleaning up temporary test users...')
-    if (studentUserId) {
-      await prisma.applicationDisbursement.deleteMany({ where: { application: { userId: studentUserId } } })
-      await prisma.applicationDocument.deleteMany({ where: { application: { userId: studentUserId } } })
-      await prisma.applicationFormData.deleteMany({ where: { application: { userId: studentUserId } } })
-      await prisma.applicationStatusHistory.deleteMany({ where: { application: { userId: studentUserId } } })
-      await prisma.application.deleteMany({ where: { userId: studentUserId } })
-      await prisma.document.deleteMany({ where: { userId: studentUserId } })
-      await prisma.academicRecord.deleteMany({ where: { userId: studentUserId } })
-      await prisma.familyInfo.deleteMany({ where: { userId: studentUserId } })
-      await prisma.studentProfile.deleteMany({ where: { userId: studentUserId } })
-      await prisma.notification.deleteMany({ where: { userId: studentUserId } })
-      await prisma.session.deleteMany({ where: { userId: studentUserId } })
-      await prisma.user.delete({ where: { id: studentUserId } }).catch(() => {})
+    try {
+      if (studentUserId) {
+        await prisma.applicationDisbursement.deleteMany({ where: { application: { userId: studentUserId } } })
+        await prisma.applicationDocument.deleteMany({ where: { application: { userId: studentUserId } } })
+        await prisma.applicationFormData.deleteMany({ where: { application: { userId: studentUserId } } })
+        await prisma.applicationStatusHistory.deleteMany({ where: { application: { userId: studentUserId } } })
+        await prisma.application.deleteMany({ where: { userId: studentUserId } })
+        await prisma.document.deleteMany({ where: { userId: studentUserId } })
+        await prisma.academicRecord.deleteMany({ where: { userId: studentUserId } })
+        await prisma.familyInfo.deleteMany({ where: { userId: studentUserId } })
+        await prisma.studentProfile.deleteMany({ where: { userId: studentUserId } })
+        await prisma.notification.deleteMany({ where: { userId: studentUserId } })
+        await prisma.session.deleteMany({ where: { userId: studentUserId } })
+        await prisma.user.delete({ where: { id: studentUserId } }).catch(() => {})
+      }
+      if (secondStudentUserId) {
+        await prisma.session.deleteMany({ where: { userId: secondStudentUserId } })
+        await prisma.notification.deleteMany({ where: { userId: secondStudentUserId } })
+        await prisma.user.delete({ where: { id: secondStudentUserId } }).catch(() => {})
+      }
+      await prisma.$disconnect()
+      console.log('Teardown complete.')
+    } catch {
+      console.log('Remote testing mode: database direct teardown skipped.')
     }
-    if (secondStudentUserId) {
-      await prisma.session.deleteMany({ where: { userId: secondStudentUserId } })
-      await prisma.notification.deleteMany({ where: { userId: secondStudentUserId } })
-      await prisma.user.delete({ where: { id: secondStudentUserId } }).catch(() => {})
-    }
-    await prisma.$disconnect()
-    console.log('Teardown complete.')
   }
 }
 
