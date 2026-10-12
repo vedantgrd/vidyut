@@ -119,6 +119,7 @@ export function AdminDocumentsPage(){
         documentId={viewingDoc.id}
         documentTitle={viewingDoc.title}
         onClose={()=>setViewingDoc(null)}
+        onDocumentUpdated={refetch}
       />
     )}
   </div>

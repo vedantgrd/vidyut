@@ -482,6 +482,7 @@ export function AdminApplicationReviewPage(){
         documentId={viewingDoc.id}
         documentTitle={viewingDoc.title}
         onClose={()=>setViewingDoc(null)}
+        onDocumentUpdated={refetch}
       />
     )}
   </div>

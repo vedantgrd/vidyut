@@ -14,11 +14,40 @@ export interface StorageDriver {
   deleteFile(filePath: string): Promise<void>
 }
 
+function resolveUploadsDir(): string {
+  if (process.env.STORAGE_PATH) {
+    return resolve(process.env.STORAGE_PATH)
+  }
+  const candidates = [
+    resolve(process.cwd(), 'apps/server/uploads'),
+    resolve(process.cwd(), 'uploads'),
+    resolve(process.cwd(), '../uploads'),
+  ]
+  for (const c of candidates) {
+    if (existsSync(c)) return c
+  }
+  if (existsSync(resolve(process.cwd(), 'apps/server'))) {
+    return resolve(process.cwd(), 'apps/server/uploads')
+  }
+  return resolve(process.cwd(), 'uploads')
+}
+
 class LocalStorageDriver implements StorageDriver {
   private basePath: string
 
-  constructor(basePath: string = process.env.STORAGE_PATH ?? './uploads') {
+  constructor(basePath: string = resolveUploadsDir()) {
     this.basePath = resolve(basePath)
+  }
+
+  private getCandidateBases(): string[] {
+    const unique = new Set<string>([
+      this.basePath,
+      resolve(process.cwd(), 'apps/server/uploads'),
+      resolve(process.cwd(), 'uploads'),
+      resolve(process.cwd(), '../uploads'),
+      resolve(process.cwd(), '../../uploads'),
+    ])
+    return Array.from(unique)
   }
 
   async saveFile(userId: string, filename: string, buffer: Buffer, _mimeType: string): Promise<string> {
@@ -31,25 +60,32 @@ class LocalStorageDriver implements StorageDriver {
 
   async getFile(filePath: string): Promise<Buffer> {
     const sanitizedRelPath = filePath.replace(/^\//, '')
-    const fullPath = resolve(this.basePath, sanitizedRelPath)
-    if (!fullPath.startsWith(this.basePath)) {
-      throw new Error('INVALID_PATH: Path traversal blocked')
+    const candidates = this.getCandidateBases()
+
+    for (const base of candidates) {
+      const fullPath = resolve(base, sanitizedRelPath)
+      if (fullPath.startsWith(base) && existsSync(fullPath)) {
+        return await readFile(fullPath)
+      }
     }
-    if (!existsSync(fullPath)) {
-      throw new Error('FILE_NOT_FOUND')
-    }
-    return await readFile(fullPath)
+
+    throw new Error('FILE_NOT_FOUND')
   }
 
   async deleteFile(filePath: string): Promise<void> {
-    try {
-      const sanitizedRelPath = filePath.replace(/^\//, '')
-      const fullPath = resolve(this.basePath, sanitizedRelPath)
-      if (fullPath.startsWith(this.basePath) && existsSync(fullPath)) {
-        await unlink(fullPath)
+    const sanitizedRelPath = filePath.replace(/^\//, '')
+    const candidates = this.getCandidateBases()
+
+    for (const base of candidates) {
+      try {
+        const fullPath = resolve(base, sanitizedRelPath)
+        if (fullPath.startsWith(base) && existsSync(fullPath)) {
+          await unlink(fullPath)
+          return
+        }
+      } catch (err) {
+        console.warn(`[LocalStorage] Failed to delete file ${filePath} at ${base}:`, err)
       }
-    } catch (err) {
-      console.warn(`[LocalStorage] Failed to delete file ${filePath}:`, err)
     }
   }
 }

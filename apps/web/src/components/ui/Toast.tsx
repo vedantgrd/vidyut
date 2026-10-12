@@ -13,6 +13,13 @@ export function toast(message:unknown,type:ToastType='info'){
   toastFn?.(cleanMsg,type)
 }
 
+export function useToast() {
+  return {
+    addToast: (type: ToastType, message: unknown) => toast(message, type),
+    toast
+  }
+}
+
 export function ToastContainer(){
   const[toasts,setToasts]=useState<ToastData[]>([])
   const addToast=useCallback((rawMessage:unknown,type:ToastType='info')=>{

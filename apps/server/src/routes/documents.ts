@@ -16,6 +16,74 @@ const MAX=5*1024*1024
 // List all documents belonging to current user
 documents.get('/',async(c)=>c.json({documents:await prisma.document.findMany({where:{userId:c.get('userId')},orderBy:{createdAt:'desc'}})}))
 
+// Get single document metadata for receipt and audit details
+documents.get('/:id',async(c)=>{
+  const id=c.req.param('id'),userId=c.get('userId'),role=c.get('role')
+  const doc=await prisma.document.findUnique({
+    where:{id},
+    include:{
+      user:{
+        select:{
+          id:true,
+          fullName:true,
+          email:true,
+          role:true,
+          studentProfile:{
+            select:{
+              phone:true,
+              category:true,
+              domicileState:true
+            }
+          }
+        }
+      },
+      verifiedByAdmin:{
+        select:{
+          id:true,
+          fullName:true,
+          email:true
+        }
+      },
+      applicationLinks:{
+        include:{
+          application:{
+            select:{
+              id:true,
+              status:true,
+              scholarship:{
+                select:{
+                  name:true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  })
+  if(!doc)return c.json({error:'Document not found'},404)
+  if(doc.userId!==userId && role!=='ADMIN' && role!=='REVIEWER')return c.json({error:'Forbidden'},403)
+  return c.json({document:doc})
+})
+
+import{generateVaultFallbackDocument}from'../services/vaultFallback.js'
+
+function detectMimeType(buf: Buffer, fallback: string): string {
+  if (buf.length >= 4 && buf[0] === 0x25 && buf[1] === 0x50 && buf[2] === 0x44 && buf[3] === 0x46) {
+    return 'application/pdf'
+  }
+  if (buf.length >= 3 && buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF) {
+    return 'image/jpeg'
+  }
+  if (buf.length >= 4 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47) {
+    return 'image/png'
+  }
+  if (buf.length >= 12 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') {
+    return 'image/webp'
+  }
+  return fallback || 'application/octet-stream'
+}
+
 // Stream/Preview/Download document file securely
 documents.get('/:id/file',async(c)=>{
   const id=c.req.param('id'),userId=c.get('userId'),role=c.get('role')
@@ -25,16 +93,79 @@ documents.get('/:id/file',async(c)=>{
 
   try{
     const fileBuffer=await storageService.getFile(doc.filePath)
-    c.header('Content-Type',doc.mimeType)
+    const effectiveMime=detectMimeType(fileBuffer,doc.mimeType)
+    c.header('Content-Type',effectiveMime)
     c.header('Content-Disposition',`inline; filename="${encodeURIComponent(doc.fileName)}"`)
     return c.body(fileBuffer as any)
   }catch(e: any){
-    if(e?.message==='FILE_NOT_FOUND')return c.json({error:'File not found on storage'},404)
+    if(e?.message==='FILE_NOT_FOUND'){
+      const fallback=generateVaultFallbackDocument(doc)
+      c.header('Content-Type',fallback.mimeType)
+      c.header('Content-Disposition',`inline; filename="${encodeURIComponent(fallback.fileName)}"`)
+      c.header('X-Vidyut-Fallback','true')
+      return c.body(fallback.buffer as any)
+    }
     if(e?.message?.includes('INVALID_PATH'))return c.json({error:'Invalid file path'},400)
     console.error('File read error:',e)
     return c.json({error:'Could not read file'},500)
   }
 })
+
+// Directly replace an existing document file by ID
+documents.post('/:id/replace',async(c)=>{
+  const id=c.req.param('id'),userId=c.get('userId'),role=c.get('role')
+  const doc=await prisma.document.findUnique({where:{id}})
+  if(!doc)return c.json({error:'Document not found'},404)
+  if(doc.userId!==userId && role!=='ADMIN' && role!=='REVIEWER')return c.json({error:'Forbidden'},403)
+
+  let fd:FormData
+  try{fd=await c.req.formData()}catch{return c.json({error:'Invalid form data'},400)}
+  const file=fd.get('file') as File|null
+  if(!file)return c.json({error:'file is required'},400)
+  if(file.size>MAX)return c.json({error:'File must be under 5MB'},400)
+
+  const ext=(extname(file.name)||'').toLowerCase()
+  const validExts=['.jpg','.jpeg','.png','.webp','.pdf']
+  let mime=file.type?.toLowerCase()||''
+  if(!mime||mime==='image/jpg'||mime==='image/pjpeg'){
+    if(ext==='.jpg'||ext==='.jpeg')mime='image/jpeg'
+    else if(ext==='.png')mime='image/png'
+    else if(ext==='.webp')mime='image/webp'
+    else if(ext==='.pdf')mime='application/pdf'
+  }
+  if(mime==='application/x-pdf')mime='application/pdf'
+  if(!ALLOWED.includes(mime)&&!validExts.includes(ext)){
+    return c.json({error:'Only JPEG, PNG, WebP, PDF allowed'},400)
+  }
+  if(!mime)mime=ext==='.pdf'?'application/pdf':'image/jpeg'
+
+  const filename=`${doc.userId}-${crypto.randomBytes(8).toString('hex')}${ext||'.pdf'}`
+  let filePath: string
+  try{
+    const buffer=Buffer.from(await file.arrayBuffer())
+    filePath=await storageService.saveFile(doc.userId,filename,buffer,mime)
+  }catch(err){
+    console.error('File write:',err)
+    return c.json({error:'Failed to save file'},500)
+  }
+
+  await storageService.deleteFile(doc.filePath).catch(()=>{})
+
+  const updated=await prisma.document.update({
+    where:{id:doc.id},
+    data:{
+      fileName:file.name,
+      filePath,
+      fileSize:file.size,
+      mimeType:mime,
+      status:'PENDING',
+      rejectionReason:null,
+      updatedAt:new Date()
+    }
+  })
+  return c.json({document:updated,message:'Document file replaced successfully'})
+})
+
 
 // Upload document with duplicate detection and replace semantics
 documents.post('/upload',async(c)=>{
@@ -107,10 +238,10 @@ documents.post('/upload',async(c)=>{
 
 // Safe delete document (handles application relationships cleanly)
 documents.delete('/:id',async(c)=>{
-  const userId=c.get('userId'),id=c.req.param('id')
+  const userId=c.get('userId'),id=c.req.param('id'),role=c.get('role')
   const doc=await prisma.document.findUnique({where:{id},include:{applicationLinks:true}})
   if(!doc)return c.json({error:'Not found'},404)
-  if(doc.userId!==userId)return c.json({error:'Forbidden'},403)
+  if(doc.userId!==userId && role!=='ADMIN' && role!=='REVIEWER')return c.json({error:'Forbidden'},403)
   
   if(doc.applicationLinks.length>0){
     // Remove links to applications first so delete doesn't violate foreign key constraints
@@ -118,7 +249,7 @@ documents.delete('/:id',async(c)=>{
   }
   await storageService.deleteFile(doc.filePath).catch(()=>{})
   await prisma.document.delete({where:{id}})
-  return c.json({message:'Deleted'})
+  return c.json({message:'Deleted',id})
 })
 
 documents.get('/admin/pending',adminMiddleware,async(c)=>c.json({documents:await prisma.document.findMany({where:{status:'PENDING'},include:{user:{select:{fullName:true,email:true}}},orderBy:{createdAt:'asc'}})}))

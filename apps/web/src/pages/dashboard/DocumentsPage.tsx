@@ -270,6 +270,7 @@ export function DocumentsPage(){
         documentId={viewingDoc.id}
         documentTitle={viewingDoc.title}
         onClose={()=>setViewingDoc(null)}
+        onDocumentUpdated={refetch}
       />
     )}
   </div>

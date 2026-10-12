@@ -3,7 +3,6 @@ import{BrowserRouter,Routes,Route,Navigate,useLocation}from'react-router-dom'
 import{useAuthStore}from'@/store/authStore'
 import{useNotificationStore}from'@/store/notificationStore'
 import{ToastContainer}from'@/components/ui/Toast'
-import{PageSpinner}from'@/components/ui/Spinner'
 import{PublicLayout}from'@/components/layout/PublicLayout'
 import{OnboardingLayout}from'@/components/layout/OnboardingLayout'
 import{StudentLayout}from'@/components/layout/StudentLayout'
@@ -33,29 +32,30 @@ import{AdminApplicationsPage}from'@/pages/admin/AdminApplicationsPage'
 import{AdminApplicationReviewPage}from'@/pages/admin/AdminApplicationReviewPage'
 import{AdminDocumentsPage}from'@/pages/admin/AdminDocumentsPage'
 import{AdminUsersPage}from'@/pages/admin/AdminUsersPage'
+import{SplashScreen}from'@/components/ui/SplashScreen'
 function RequireAuth({children}:{children:React.ReactNode}){
   const{user,isInitialized}=useAuthStore();const location=useLocation()
-  if(!isInitialized)return<PageSpinner/>
+  if(!isInitialized)return<SplashScreen/>
   if(!user)return<Navigate to="/login" state={{from:location}} replace/>
   return<>{children}</>
 }
 function RequireOnboarding({children}:{children:React.ReactNode}){
   const{user,isInitialized}=useAuthStore();const location=useLocation()
-  if(!isInitialized)return<PageSpinner/>
+  if(!isInitialized)return<SplashScreen/>
   if(!user)return<Navigate to="/login" state={{from:location}} replace/>
   if(!user.onboardingComplete){const steps=['personal','academic','family','documents'];const path=steps[Math.max(0,user.onboardingStep-1)]??'personal';return<Navigate to={`/onboarding/${path}`} replace/>}
   return<>{children}</>
 }
 function RequireAdmin({children}:{children:React.ReactNode}){
   const{user,isInitialized}=useAuthStore();const location=useLocation()
-  if(!isInitialized)return<PageSpinner/>
+  if(!isInitialized)return<SplashScreen/>
   if(!user)return<Navigate to="/login" state={{from:location}} replace/>
   if(user.role!=='ADMIN'&&user.role!=='REVIEWER')return<Navigate to="/dashboard" replace/>
   return<>{children}</>
 }
 function RedirectIfAuth({children}:{children:React.ReactNode}){
   const{user,isInitialized}=useAuthStore()
-  if(!isInitialized)return<PageSpinner/>
+  if(!isInitialized)return<SplashScreen/>
   if(user){
     if(user.role==='ADMIN'||user.role==='REVIEWER')return<Navigate to="/admin" replace/>
     if(!user.onboardingComplete){const steps=['personal','academic','family','documents'];const path=steps[Math.max(0,user.onboardingStep-1)]??'personal';return<Navigate to={`/onboarding/${path}`} replace/>}
@@ -67,7 +67,7 @@ function AppBootstrap(){
   const{refreshSession,isInitialized}=useAuthStore(),{fetchUnreadCount}=useNotificationStore(),user=useAuthStore(s=>s.user)
   useEffect(()=>{refreshSession()},[refreshSession])
   useEffect(()=>{if(user&&user.role==='STUDENT'){fetchUnreadCount();const interval=setInterval(fetchUnreadCount,60000);return()=>clearInterval(interval)}},[user,fetchUnreadCount])
-  if(!isInitialized)return<PageSpinner/>
+  if(!isInitialized)return<SplashScreen/>
   return<Routes>
     <Route element={<RedirectIfAuth><PublicLayout/></RedirectIfAuth>}>
       <Route path="/" element={<LandingPage/>}/>

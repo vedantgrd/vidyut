@@ -584,6 +584,7 @@ export function ApplicationDetailPage(){
         documentId={viewingDoc.id}
         documentTitle={viewingDoc.title}
         onClose={()=>setViewingDoc(null)}
+        onDocumentUpdated={()=>{refetch();refetchDocs()}}
       />
     )}
   </motion.div>

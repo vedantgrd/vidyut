@@ -76,7 +76,7 @@ export async function apiRequest<T = unknown>(path: string, options: RequestInit
   return data as T
 }
 
-export async function apiBlobRequest(path: string, options: RequestInit = {}): Promise<{ blob: Blob; mimeType: string; fileName: string }> {
+export async function apiBlobRequest(path: string, options: RequestInit = {}): Promise<{ blob: Blob; mimeType: string; fileName: string; isFallback: boolean }> {
   const headers: Record<string, string> = { ...(options.headers as Record<string, string>) }
   if (_accessToken) headers['Authorization'] = `Bearer ${_accessToken}`
 
@@ -101,6 +101,7 @@ export async function apiBlobRequest(path: string, options: RequestInit = {}): P
 
   const mimeType = res.headers.get('content-type') || 'application/octet-stream'
   const disposition = res.headers.get('content-disposition') || ''
+  const isFallback = res.headers.get('x-vidyut-fallback') === 'true'
   let fileName = 'document'
   const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)
   if (match && match[1]) {
@@ -108,7 +109,7 @@ export async function apiBlobRequest(path: string, options: RequestInit = {}): P
   }
 
   const blob = await res.blob()
-  return { blob, mimeType, fileName }
+  return { blob, mimeType, fileName, isFallback }
 }
 
 export const api = {

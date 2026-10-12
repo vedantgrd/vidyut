@@ -54,6 +54,8 @@ export const Button=forwardRef<HTMLButtonElement,ButtonProps>(({
       outline:'none',
       fontFamily:'inherit',
       transition:'all 0.15s',
+      whiteSpace:'nowrap',
+      flexShrink:0,
       opacity:(disabled||isLoading)?0.5:1,
       ...Object.fromEntries(V[variant].split(';').filter(Boolean).map(s=>{const[k,...v]=s.trim().split(':');return[k.trim().replace(/-([a-z])/g,(_,c)=>c.toUpperCase()),v.join(':').trim()]})),
       ...Object.fromEntries(Z[size].split(';').filter(Boolean).map(s=>{const[k,...v]=s.trim().split(':');return[k.trim().replace(/-([a-z])/g,(_,c)=>c.toUpperCase()),v.join(':').trim()]})),
