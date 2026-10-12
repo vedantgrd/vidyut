@@ -313,8 +313,10 @@ npm run dev
 
 | Service | URL |
 |---|---|
-| 🖥️ **Frontend** | http://localhost:5173 |
-| ⚙️ **Backend API** | http://localhost:3001 |
+| 🌐 **Live Public Demo** | [https://vidyut-three.vercel.app](https://vidyut-three.vercel.app) |
+| ⚙️ **Live REST API** | [https://vidyut-api.onrender.com/api/v1](https://vidyut-api.onrender.com/api/v1) |
+| 🖥️ **Local Frontend** | http://localhost:5173 |
+| ⚙️ **Local Backend API** | http://localhost:3001 |
 
 ---
 
