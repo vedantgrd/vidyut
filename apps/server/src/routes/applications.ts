@@ -164,19 +164,19 @@ applications.post('/:id/submit',zValidator('json',submitApplicationSchema),async
   if(app.userId!==userId)return c.json({error:'Forbidden'},403)
   if(app.status!=='DRAFT')return c.json({error:'Application has already been submitted',code:'ALREADY_SUBMITTED'},400)
 
-  const reqDocs=app.scholarship.requiredDocuments.filter(r=>!r.isOptional)
-  const attIds=app.documents.map(d=>d.requiredDocumentId)
-  const missing=reqDocs.filter(r=>!attIds.includes(r.id))
+  const reqDocs=(app.scholarship.requiredDocuments as any[]).filter((r: any)=>!r.isOptional)
+  const attIds=(app.documents as any[]).map((d: any)=>d.requiredDocumentId)
+  const missing=reqDocs.filter((r: any)=>!attIds.includes(r.id))
   if(missing.length){
     return c.json({
       error:'MISSING_DOCUMENTS',
-      message:`Please attach all required documents (${missing.map(m=>m.label).join(', ')}) before submitting.`,
+      message:`Please attach all required documents (${missing.map((m: any)=>m.label).join(', ')}) before submitting.`,
       missingCount:missing.length
     },400)
   }
 
   // Atomically update application status, create status history, and create notification
-  const updated=await prisma.$transaction(async(tx)=>{
+  const updated=await prisma.$transaction(async(tx: any)=>{
     const res=await tx.application.update({
       where:{id},
       data:{

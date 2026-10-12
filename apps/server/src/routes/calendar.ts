@@ -2,7 +2,6 @@ import { Hono } from 'hono'
 import { prisma } from '../lib/prisma.js'
 import { authMiddleware } from '../middleware/auth.js'
 import { EligibilityEngine } from '../lib/EligibilityEngine.js'
-import { ScholarshipStatus } from '@prisma/client'
 
 const calendar = new Hono<{ Variables: { userId: string; role: string } }>()
 
@@ -21,7 +20,7 @@ calendar.get('/events', async (c) => {
   const scholarships = await prisma.scholarship.findMany({
     where: {
       deadline: { gte: startOfMonth, lte: endOfMonth },
-      status: ScholarshipStatus.ACTIVE
+      status: 'ACTIVE'
     }
   })
 
@@ -34,7 +33,7 @@ calendar.get('/events', async (c) => {
   const events = []
 
   for (const s of scholarships) {
-    const matchingApp = applications.find(a => a.scholarshipId === s.id)
+    const matchingApp = applications.find((a: any) => a.scholarshipId === s.id)
     
     if (matchingApp) {
       events.push({

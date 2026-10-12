@@ -51,13 +51,13 @@ dashboard.get('/home',async(c)=>{
   const approved=ta.filter((a:AR)=>a.status==='APPROVED')
 
   // Calculate DBT fund disbursement totals
-  const totalDisbursed=ta.reduce((acc,a)=>acc+(a.disbursedAmount||0),0)
-  const totalApprovedAmount=approved.reduce((acc,a)=>acc+a.scholarship.amount,0)
+  const totalDisbursed=ta.reduce((acc: number,a: any)=>acc+(a.disbursedAmount||0),0)
+  const totalApprovedAmount=approved.reduce((acc: number,a: any)=>acc+a.scholarship.amount,0)
   const pendingDisbursement=Math.max(0,totalApprovedAmount-totalDisbursed)
 
   // Document Vault stats
-  const vaultVerified=docs.filter(d=>d.status==='VERIFIED').length
-  const vaultPending=docs.filter(d=>d.status==='PENDING').length
+  const vaultVerified=docs.filter((d: any)=>d.status==='VERIFIED').length
+  const vaultPending=docs.filter((d: any)=>d.status==='PENDING').length
 
   const hr=new Date().getHours()
   const greeting=`${hr<12?'Good morning':hr<17?'Good afternoon':'Good evening'}, ${user?.fullName?.split(' ')[0]??'there'}`
