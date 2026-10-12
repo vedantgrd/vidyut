@@ -140,18 +140,34 @@ export class EligibilityEngine {
     }
 
     switch (rule.ruleType) {
-      case RuleType.INCOME: {
+      case RuleType.INCOME_MAX: {
         if (!family || family.annualFamilyIncome === null) {
           result.reason = 'Family income details are missing'
           return result
         }
         const val = rule.value as any
-        const maxIncome = typeof val === 'object' && val !== null && 'max' in val ? val.max : Number(val)
+        const maxIncome = typeof val === 'object' && val !== null && 'value' in val ? val.value : (typeof val === 'object' && val !== null && 'max' in val ? val.max : Number(val))
         if (family.annualFamilyIncome <= maxIncome) {
           result.passed = true
           result.reason = `Annual income (₹${family.annualFamilyIncome}) is below or equal to ₹${maxIncome}`
         } else {
           result.reason = `Annual income (₹${family.annualFamilyIncome}) exceeds ₹${maxIncome}`
+        }
+        break
+      }
+
+      case RuleType.INCOME_MIN: {
+        if (!family || family.annualFamilyIncome === null) {
+          result.reason = 'Family income details are missing'
+          return result
+        }
+        const val = rule.value as any
+        const minIncome = typeof val === 'object' && val !== null && 'value' in val ? val.value : (typeof val === 'object' && val !== null && 'min' in val ? val.min : Number(val))
+        if (family.annualFamilyIncome >= minIncome) {
+          result.passed = true
+          result.reason = `Annual income (₹${family.annualFamilyIncome}) meets or exceeds ₹${minIncome}`
+        } else {
+          result.reason = `Annual income (₹${family.annualFamilyIncome}) is below ₹${minIncome}`
         }
         break
       }
@@ -162,7 +178,8 @@ export class EligibilityEngine {
           result.reason = 'Social category is missing'
           return result
         }
-        const categories = Array.isArray(rule.value) ? rule.value : [rule.value]
+        const val = rule.value as any
+        const categories = Array.isArray(val) ? val : (typeof val === 'object' && val !== null && 'values' in val ? val.values : [val])
         if (categories.includes(studentCategory)) {
           result.passed = true
           result.reason = `Student category (${studentCategory}) matches required: ${categories.join(', ')}`
@@ -178,7 +195,8 @@ export class EligibilityEngine {
           result.reason = 'Current education level details are missing'
           return result
         }
-        const levels = Array.isArray(rule.value) ? rule.value : [rule.value]
+        const val = rule.value as any
+        const levels = Array.isArray(val) ? val : (typeof val === 'object' && val !== null && 'values' in val ? val.values : [val])
         if (levels.includes(currentAcademic.level)) {
           result.passed = true
           result.reason = `Current education level (${currentAcademic.level}) matches required: ${levels.join(', ')}`
@@ -188,39 +206,52 @@ export class EligibilityEngine {
         break
       }
 
-      case RuleType.MARKS: {
+      case RuleType.MIN_PERCENTAGE: {
         const sortedAcademics = [...academics].sort((a, b) => {
           const order = ['CLASS_10', 'CLASS_12', 'DIPLOMA', 'UNDERGRADUATE', 'POSTGRADUATE', 'DOCTORATE']
           return order.indexOf(a.level) - order.indexOf(b.level)
         })
-        
-        // Check highest completed level
         const completedAcademics = sortedAcademics.filter(a => !a.isCurrentlyPursuing)
         const highestCompleted = completedAcademics[completedAcademics.length - 1]
 
-        if (!highestCompleted) {
+        if (!highestCompleted || highestCompleted.percentage === null) {
           result.reason = 'No completed academic records found to verify marks'
           return result
         }
 
         const val = rule.value as any
-        
-        if (val.minPercentage !== undefined) {
-          if (highestCompleted.percentage >= val.minPercentage) {
-            result.passed = true
-            result.reason = `Latest completed percentage (${highestCompleted.percentage}%) meets minimum requirement of ${val.minPercentage}%`
-          } else {
-            result.reason = `Latest completed percentage (${highestCompleted.percentage}%) is below minimum requirement of ${val.minPercentage}%`
-          }
-        } else if (val.minCGPA !== undefined) {
-          if (highestCompleted.cgpa !== null && highestCompleted.cgpa >= val.minCGPA) {
-            result.passed = true
-            result.reason = `Latest completed CGPA (${highestCompleted.cgpa}) meets minimum requirement of ${val.minCGPA}`
-          } else {
-            result.reason = `Latest completed CGPA (${highestCompleted.cgpa ?? 'N/A'}) is below minimum requirement of ${val.minCGPA}`
-          }
+        const minPercentage = typeof val === 'object' && val !== null && 'value' in val ? val.value : (typeof val === 'object' && val !== null && 'minPercentage' in val ? val.minPercentage : Number(val))
+
+        if (highestCompleted.percentage >= minPercentage) {
+          result.passed = true
+          result.reason = `Latest completed percentage (${highestCompleted.percentage}%) meets minimum requirement of ${minPercentage}%`
         } else {
-          result.reason = 'Marks eligibility criteria is configured incorrectly'
+          result.reason = `Latest completed percentage (${highestCompleted.percentage}%) is below minimum requirement of ${minPercentage}%`
+        }
+        break
+      }
+
+      case RuleType.MIN_CGPA: {
+        const sortedAcademics = [...academics].sort((a, b) => {
+          const order = ['CLASS_10', 'CLASS_12', 'DIPLOMA', 'UNDERGRADUATE', 'POSTGRADUATE', 'DOCTORATE']
+          return order.indexOf(a.level) - order.indexOf(b.level)
+        })
+        const completedAcademics = sortedAcademics.filter(a => !a.isCurrentlyPursuing)
+        const highestCompleted = completedAcademics[completedAcademics.length - 1]
+
+        if (!highestCompleted || highestCompleted.cgpa === null) {
+          result.reason = 'No completed academic records found with CGPA to verify'
+          return result
+        }
+
+        const val = rule.value as any
+        const minCGPA = typeof val === 'object' && val !== null && 'value' in val ? val.value : (typeof val === 'object' && val !== null && 'minCGPA' in val ? val.minCGPA : Number(val))
+
+        if (highestCompleted.cgpa >= minCGPA) {
+          result.passed = true
+          result.reason = `Latest completed CGPA (${highestCompleted.cgpa}) meets minimum requirement of ${minCGPA}`
+        } else {
+          result.reason = `Latest completed CGPA (${highestCompleted.cgpa}) is below minimum requirement of ${minCGPA}`
         }
         break
       }

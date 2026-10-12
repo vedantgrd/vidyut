@@ -336,14 +336,75 @@ Pre-seeded accounts are available via the **Quick Demo Access** card on the logi
 
 ```bash
 # TypeScript compilation checks across all packages
-npm run typecheck --workspaces
+npm run typecheck
 
-# Verify database state & seeded records
-cd apps/server && npx tsx verify-db.ts
+# Full automated end-to-end journey test suite (60 assertions across auth, onboarding, vault, eligibility, submit, admin review, and DBT payouts)
+npm run test:e2e
 
-# Simulated end-to-end application lifecycle
-cd apps/server && npx tsx test-e2e.ts
+# Production build validation across workspaces
+npm run build
+
+# Capture fresh high-resolution browser walkthrough screenshots in headless Chrome
+node scripts/capture-screenshots.js
 ```
+
+---
+
+## 🌐 Production Deployment Guide
+
+### Architecture at a Glance
+- **Frontend (`apps/web`)**: Static SPA built with Vite. Can be deployed to any static host (Vercel, Netlify, Cloudflare Pages, AWS S3 + CloudFront, or Nginx).
+- **Backend (`apps/server`)**: Node.js HTTP service running Hono v4. Can be hosted on Docker, AWS ECS/EC2, Render, Railway, or VPS.
+- **Database (`PostgreSQL 16`)**: Managed PostgreSQL instance (AWS RDS, Neon, Supabase, Railway) or Dockerized container.
+
+### Step-by-Step Deployment
+
+#### 1. Database Provisioning & Migrations
+Set `DATABASE_URL` in your production environment and deploy schema migrations:
+```bash
+cd apps/server
+npx prisma migrate deploy
+# Optional: Seed initial national and state scholarship catalog
+npm run db:seed
+```
+
+#### 2. Backend Server Deployment
+1. Set the production environment variables:
+   - `DATABASE_URL`: Connection string to your production PostgreSQL database.
+   - `JWT_ACCESS_SECRET`: 64-character cryptographically random string (`openssl rand -base64 48`).
+   - `JWT_REFRESH_SECRET`: Separate 64-character cryptographically random string.
+   - `FRONTEND_URL`: URL of your deployed frontend (e.g., `https://vidyut.yourdomain.in`).
+   - `PORT`: `3001` (or provider's default port).
+   - `NODE_ENV`: `production`.
+   - `STORAGE_PATH`: Path to persistent disk volume mount (e.g., `/mnt/data/uploads`).
+2. Build and run:
+   ```bash
+   npm run build --workspace=apps/server
+   npm run start --workspace=apps/server
+   ```
+3. Health check verification: `GET https://api.yourdomain.in/health` returns `{"status":"ok"}`.
+
+#### 3. Frontend Deployment
+1. Set `VITE_API_URL` to point to your backend API base:
+   ```env
+   VITE_API_URL="https://api.yourdomain.in/api/v1"
+   ```
+2. Build production bundle:
+   ```bash
+   npm run build --workspace=apps/web
+   ```
+3. Deploy the resulting `apps/web/dist/` directory to your static hosting provider with SPA fallback routing to `index.html`.
+
+---
+
+## ⚠️ Known Limitations & Integrations
+
+| Area | Production Status | Implementation Detail |
+|---|---|---|
+| **Email Delivery** | Pluggable / Simulated in Dev | Built-in support for Resend via `RESEND_API_KEY`. When no key is set (development mode), verification links and reset tokens are logged cleanly without failing transactions. |
+| **Direct Benefit Transfer (DBT)** | Treasury Audit Ledger | Payouts record administrative transaction reference numbers (`referenceCode`), dates, and installment records. It does not execute live banking NEFT/RTGS wire transfers without a banking portal partnership. |
+| **Document Storage** | Local Disk / Volume Mount | Documents are saved to `STORAGE_PATH` (`./uploads`). For ephemeral containers (e.g. standard Render or Heroku without persistent disks), configure a mounted volume or S3 object store adapter. |
+| **Browser Compatibility** | Modern Evergreen | Verified on Chrome, Firefox, Edge, and Safari with CSS token variables and React 19. |
 
 ---
 
@@ -359,7 +420,7 @@ Change the host port mapping in `docker-compose.yml`, then update the port in `D
 <details>
 <summary><b>Prisma can't connect to the database</b></summary>
 
-Confirm the container is healthy with `docker compose ps`, and that `DATABASE_URL` in `apps/server/.env` uses port `5433`.
+Confirm the container is healthy with `docker compose ps`, and that `DATABASE_URL` in `apps/server/.env` uses port `5433` (for the bundled Docker container) or `5432` (for native PostgreSQL).
 
 </details>
 

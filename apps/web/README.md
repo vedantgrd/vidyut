@@ -9,7 +9,6 @@
 [![Prisma](https://img.shields.io/badge/Prisma-5.22-2d3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-646cff?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <br/>
 
@@ -201,8 +200,8 @@ Create `.env` file for the backend:
 ```bash
 # In apps/server/.env
 DATABASE_URL="postgresql://vidyut:vidyut_password@localhost:5433/vidyut_db"
-JWT_ACCESS_SECRET="MumxNGhRMHHLxTd63ToVdDM9UxzOoSkZa6hyl+VI5hJNM29Nt4QDo0kBn/Vc6viO"
-JWT_REFRESH_SECRET="4IfBFB1weKew//0yO7yTRDdDSJlwxOug8mGW0TdY7wWc5to6nipL5xQAdKYmU34v"
+JWT_ACCESS_SECRET="<paste-a-random-secret>"
+JWT_REFRESH_SECRET="<paste-a-different-random-secret>"
 JWT_ACCESS_EXPIRY="15m"
 JWT_REFRESH_EXPIRY="7d"
 PORT=3001
@@ -263,10 +262,6 @@ cd apps/server && npx tsx test-e2e.ts
 ```
 
 ---
-
-## 📄 License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 <br/>
 

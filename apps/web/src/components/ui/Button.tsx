@@ -2,12 +2,13 @@ import{forwardRef}from'react'
 import{motion}from'framer-motion'
 import{Loader2}from'lucide-react'
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>{
-  variant?:'primary'|'secondary'|'ghost'|'danger'|'outline'|'success';
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>{
+  variant?:'primary'|'secondary'|'ghost'|'danger'|'outline'|'success'|'magic';
   size?:'sm'|'md'|'lg';
   isLoading?:boolean;
   leftIcon?:React.ReactNode;
   rightIcon?:React.ReactNode;
+  fullWidth?:boolean;
 }
 
 const V={
@@ -16,7 +17,8 @@ const V={
   ghost:'background:transparent;color:#475569;border:1px solid transparent',
   danger:'background:#fee2e2;color:#b91c1c;border:1px solid #fecaca',
   outline:'border:1px solid #cbd5e1;color:#1e40af;background:#ffffff',
-  success:'background:#059669;color:#ffffff;border:1px solid #059669'
+  success:'background:#059669;color:#ffffff;border:1px solid #059669',
+  magic:'background:linear-gradient(135deg, #1e40af 0%, #059669 100%);color:#ffffff;border:1px solid transparent;box-shadow:0 1px 2px 0 rgba(0,0,0,0.05)'
 }
 
 const Z={
@@ -31,6 +33,7 @@ export const Button=forwardRef<HTMLButtonElement,ButtonProps>(({
   isLoading,
   leftIcon,
   rightIcon,
+  fullWidth,
   children,
   className='',
   disabled,
@@ -40,7 +43,8 @@ export const Button=forwardRef<HTMLButtonElement,ButtonProps>(({
   <motion.button ref={ref} whileTap={{scale:0.98}}
     disabled={disabled||isLoading}
     style={{
-      display:'inline-flex',
+      display:fullWidth?'flex':'inline-flex',
+      width:fullWidth?'100%':undefined,
       alignItems:'center',
       justifyContent:'center',
       gap:8,

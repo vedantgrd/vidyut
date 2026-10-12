@@ -37,8 +37,8 @@ export class ApplicationPrefiller {
       if (profile.religion) prefilled.religion = profile.religion
       if (profile.category) prefilled.category = profile.category
       if (profile.domicileState) prefilled.domicileState = profile.domicileState
-      prefilled.isMinority = String(profile.isMinority)
-      prefilled.hasDisability = String(profile.hasDisability)
+      if (profile.isMinority !== null && profile.isMinority !== undefined) prefilled.isMinority = String(profile.isMinority)
+      if (profile.hasDisability !== null && profile.hasDisability !== undefined) prefilled.hasDisability = String(profile.hasDisability)
 
       if (profile.addressLine1) prefilled.addressLine1 = profile.addressLine1
       if (profile.addressLine2) prefilled.addressLine2 = profile.addressLine2
@@ -50,28 +50,28 @@ export class ApplicationPrefiller {
     if (family) {
       if (family.fatherName) prefilled.fatherName = family.fatherName
       if (family.fatherOccupation) prefilled.fatherOccupation = family.fatherOccupation
-      if (family.fatherIncome !== null) prefilled.fatherIncome = String(family.fatherIncome)
+      if (family.fatherIncome !== null && family.fatherIncome !== undefined) prefilled.fatherIncome = String(family.fatherIncome)
       if (family.motherName) prefilled.motherName = family.motherName
       if (family.motherOccupation) prefilled.motherOccupation = family.motherOccupation
-      if (family.motherIncome !== null) prefilled.motherIncome = String(family.motherIncome)
-      if (family.annualFamilyIncome !== null) prefilled.annualFamilyIncome = String(family.annualFamilyIncome)
-      prefilled.isBPL = String(family.isBPL)
-      prefilled.numberOfDependents = String(family.numberOfDependents)
+      if (family.motherIncome !== null && family.motherIncome !== undefined) prefilled.motherIncome = String(family.motherIncome)
+      if (family.annualFamilyIncome !== null && family.annualFamilyIncome !== undefined) prefilled.annualFamilyIncome = String(family.annualFamilyIncome)
+      if (family.isBPL !== null && family.isBPL !== undefined) prefilled.isBPL = String(family.isBPL)
+      if (family.numberOfDependents !== null && family.numberOfDependents !== undefined) prefilled.numberOfDependents = String(family.numberOfDependents)
       if (family.guardianName) prefilled.guardianName = family.guardianName
     }
 
     // Populate academic records
     for (const record of academics) {
       const prefix = record.level.toLowerCase() // class_10, class_12, undergraduate, etc.
-      prefilled[`${prefix}_institutionName`] = record.institutionName
-      prefilled[`${prefix}_boardOrUniversity`] = record.boardOrUniversity
+      if (record.institutionName) prefilled[`${prefix}_institutionName`] = record.institutionName
+      if (record.boardOrUniversity) prefilled[`${prefix}_boardOrUniversity`] = record.boardOrUniversity
       if (record.courseName) prefilled[`${prefix}_courseName`] = record.courseName
       if (record.branch) prefilled[`${prefix}_branch`] = record.branch
-      prefilled[`${prefix}_percentage`] = String(record.percentage)
-      if (record.cgpa !== null) prefilled[`${prefix}_cgpa`] = String(record.cgpa)
-      prefilled[`${prefix}_passingYear`] = String(record.passingYear)
-      if (record.admissionYear !== null) prefilled[`${prefix}_admissionYear`] = String(record.admissionYear)
-      if (record.currentSemester !== null) prefilled[`${prefix}_currentSemester`] = String(record.currentSemester)
+      if (record.percentage !== null && record.percentage !== undefined) prefilled[`${prefix}_percentage`] = String(record.percentage)
+      if (record.cgpa !== null && record.cgpa !== undefined) prefilled[`${prefix}_cgpa`] = String(record.cgpa)
+      if (record.passingYear !== null && record.passingYear !== undefined) prefilled[`${prefix}_passingYear`] = String(record.passingYear)
+      if (record.admissionYear !== null && record.admissionYear !== undefined) prefilled[`${prefix}_admissionYear`] = String(record.admissionYear)
+      if (record.currentSemester !== null && record.currentSemester !== undefined) prefilled[`${prefix}_currentSemester`] = String(record.currentSemester)
       prefilled[`${prefix}_isCurrentlyPursuing`] = String(record.isCurrentlyPursuing)
     }
 

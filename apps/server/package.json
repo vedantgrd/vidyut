@@ -13,7 +13,8 @@
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset --force && tsx prisma/seed.ts",
     "db:generate": "prisma generate",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "tsx test-full-journey.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.2",

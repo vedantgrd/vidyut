@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+*/node_modules/
+*/*/node_modules/
+
+# Production & Build outputs
+dist/
+*/dist/
+*/*/dist/
+.vite/
+*/*/.vite/
+*.tsbuildinfo
+*/*/*.tsbuildinfo
+
+# Environment & Secrets (only keep .env.example templates)
+.env
+.env.*
+!.env.example
+!*/.env.example
+!*/*/.env.example
+
+# Uploaded Files & Private User Documents
+uploads/
+*/uploads/
+*/*/uploads/
+
+# Release Packages & Archives
+*.zip
+*.tar.gz
+dist-release/
+temp_release/
+
+# Logs & Temporary Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+coverage/
+

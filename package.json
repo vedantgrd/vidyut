@@ -2,12 +2,16 @@
   "name": "vidyut",
   "private": true,
   "version": "1.0.0",
+  "type": "module",
   "workspaces": [
     "apps/web",
     "apps/server"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=apps/server\" \"npm run dev --workspace=apps/web\"",
+    "build": "concurrently \"npm run build --workspace=apps/server\" \"npm run build --workspace=apps/web\"",
+    "typecheck": "concurrently \"npm run typecheck --workspace=apps/server\" \"npm run typecheck --workspace=apps/web\"",
+    "test:e2e": "npm run test:e2e --workspace=apps/server",
     "db:seed": "npm run db:seed --workspace=apps/server"
   },
   "devDependencies": {
