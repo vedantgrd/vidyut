@@ -27,7 +27,7 @@ app.use('*', cors({
   origin: (origin) => {
     if (!origin) return allowedOrigins[0] ?? 'http://localhost:5173'
     const normalized = origin.replace(/\/+$/, '')
-    if (allowedOrigins.includes(normalized)) return origin
+    if (allowedOrigins.includes(normalized) || normalized.endsWith('.vercel.app')) return origin
     // Check if localhost in development
     if (process.env.NODE_ENV !== 'production' && /^http:\/\/localhost(:\d+)?$/.test(normalized)) {
       return origin
