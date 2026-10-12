@@ -18,7 +18,7 @@ export const MonthGrid: React.FC<MonthGridProps> = React.memo(({ currentDate, ev
   const days = eachDayOfInterval({ start: startDate, end: endDate });
 
   const getEventsForDay = (day: Date) => {
-    return events.filter(e => isSameDay(new Date(e.date), day));
+    return events.filter((e: CalendarEvent) => isSameDay(new Date(e.date), day));
   };
 
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -26,12 +26,12 @@ export const MonthGrid: React.FC<MonthGridProps> = React.memo(({ currentDate, ev
   return (
     <div className={styles.gridContainer}>
       <div className={styles.weekDays}>
-        {weekDays.map(day => (
+        {weekDays.map((day: string) => (
           <div key={day} className={styles.weekDay}>{day}</div>
         ))}
       </div>
       <div className={styles.daysGrid}>
-        {days.map(day => {
+        {days.map((day: Date) => {
           const dayEvents = getEventsForDay(day);
           const isCurrentMonth = isSameMonth(day, monthStart);
           const isToday = isSameDay(day, new Date());
