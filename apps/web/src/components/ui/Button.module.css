@@ -13,10 +13,28 @@
   transition: background-color var(--duration-fast) var(--motion-spring),
               border-color var(--duration-fast) var(--motion-spring),
               color var(--duration-fast) var(--motion-spring),
-              box-shadow var(--duration-fast) var(--motion-spring);
+              box-shadow var(--duration-fast) var(--motion-spring),
+              transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, box-shadow;
   /* Prevent iOS tap highlight */
   -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button:hover:not(.disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.button:active:not(.disabled) {
+  transform: translateY(1px) scale(0.985);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none !important;
+    transform: none !important;
+  }
 }
 
 .button:focus-visible {

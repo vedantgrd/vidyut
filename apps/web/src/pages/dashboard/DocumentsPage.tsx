@@ -12,7 +12,8 @@ import {
   Shield,
   AlertTriangle,
   Search,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Lock
 } from 'lucide-react'
 import { useApi } from '@/hooks/useApi'
 import { api } from '@/api/client'
@@ -47,10 +48,10 @@ const DOC_TYPES = [
 ]
 
 const SI: Record<string, React.ReactNode> = {
-  VERIFIED: <CheckCircle size={18} color="#059669" />,
-  PENDING: <Clock size={18} color="#d97706" />,
-  REJECTED: <XCircle size={18} color="#dc2626" />,
-  EXPIRED: <AlertCircle size={18} color="#64748b" />
+  VERIFIED: <CheckCircle size={18} color="var(--success)" />,
+  PENDING: <Clock size={18} color="var(--warning)" />,
+  REJECTED: <XCircle size={18} color="var(--error)" />,
+  EXPIRED: <AlertCircle size={18} color="var(--text-muted)" />
 }
 
 export function DocumentsPage() {
@@ -105,7 +106,7 @@ export function DocumentsPage() {
         setDeleteWarningDoc({
           id: doc.id,
           label: doc.label,
-          activeApps: usage.applications.map(a => a.scholarshipName)
+          activeApps: usage.applications.map((a) => a.scholarshipName)
         })
         return
       }
@@ -134,7 +135,7 @@ export function DocumentsPage() {
   const uploadFile = async (file: File, type: string, replace = false) => {
     setUploading(true)
     try {
-      const label = DOC_TYPES.find(d => d.value === type)?.label ?? type
+      const label = DOC_TYPES.find((d) => d.value === type)?.label ?? type
       const fd = new FormData()
       fd.append('file', file)
       fd.append('type', type)
@@ -148,7 +149,7 @@ export function DocumentsPage() {
     } catch (e: any) {
       const errMsg = e?.message || ''
       if (errMsg.includes('DUPLICATE_DOCUMENT') || errMsg.toLowerCase().includes('already uploaded')) {
-        const label = DOC_TYPES.find(d => d.value === type)?.label ?? type
+        const label = DOC_TYPES.find((d) => d.value === type)?.label ?? type
         setDuplicatePending({ file, type, label })
       } else {
         toast(e, 'error')
@@ -169,8 +170,9 @@ export function DocumentsPage() {
   const allDocs = data?.documents ?? []
 
   // Filtered documents
-  const filteredDocs = allDocs.filter(d => {
-    const matchesSearch = d.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredDocs = allDocs.filter((d) => {
+    const matchesSearch =
+      d.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
       d.fileName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (d.documentNumber && d.documentNumber.toLowerCase().includes(searchQuery.toLowerCase()))
 
@@ -187,65 +189,94 @@ export function DocumentsPage() {
   })
 
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
       {/* Header Banner */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-          <div style={{ width: 34, height: 34, borderRadius: 8, background: '#eff6ff', color: '#1e40af', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Shield size={20} />
+          <div
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--accent-subtle)',
+              border: '1px solid var(--accent-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Shield size={18} color="var(--primary)" />
           </div>
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#0f172a', margin: 0 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
             Intelligent Document Vault
           </h1>
         </div>
-        <p style={{ color: '#64748b', fontSize: 14, margin: 0 }}>
-          Secure, reusable credentials with scheme-aware expiry management, instant verification status, and auto-linking.
+        <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: 0 }}>
+          Secure, reusable credentials with scheme-aware validity, instant verification status, and auto-linking.
         </p>
       </div>
 
       {/* Vault Health Analytics Cards */}
       {vaultSummary && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
-          <Card style={{ padding: '14px 18px', border: '1px solid #e2e8f0', background: '#ffffff' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Total Stored</span>
-            <p style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', margin: '4px 0 0' }}>{vaultSummary.total}</p>
+          <Card style={{ padding: '14px 18px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)' }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Total Stored
+            </span>
+            <p className="font-tabular" style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', margin: '4px 0 0' }}>
+              {vaultSummary.total}
+            </p>
           </Card>
-          <Card style={{ padding: '14px 18px', border: '1px solid #bbf7d0', background: '#f0fdf4' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#065f46', textTransform: 'uppercase' }}>Verified Credentials</span>
-            <p style={{ fontSize: 22, fontWeight: 800, color: '#059669', margin: '4px 0 0' }}>{vaultSummary.verified}</p>
+          <Card style={{ padding: '14px 18px', border: '1px solid var(--success-border)', background: 'var(--success-subtle)' }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--success)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Verified Credentials
+            </span>
+            <p className="font-tabular" style={{ fontSize: 22, fontWeight: 700, color: 'var(--success)', margin: '4px 0 0' }}>
+              {vaultSummary.verified}
+            </p>
           </Card>
-          <Card style={{ padding: '14px 18px', border: '1px solid #fed7aa', background: '#fffbeb' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#92400e', textTransform: 'uppercase' }}>Under Verification</span>
-            <p style={{ fontSize: 22, fontWeight: 800, color: '#d97706', margin: '4px 0 0' }}>{vaultSummary.pending}</p>
+          <Card style={{ padding: '14px 18px', border: '1px solid var(--warning-border)', background: 'var(--warning-subtle)' }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--warning)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Under Review
+            </span>
+            <p className="font-tabular" style={{ fontSize: 22, fontWeight: 700, color: 'var(--warning)', margin: '4px 0 0' }}>
+              {vaultSummary.pending}
+            </p>
           </Card>
-          <Card style={{ padding: '14px 18px', border: '1px solid #bfdbfe', background: '#eff6ff' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#1e40af', textTransform: 'uppercase' }}>Applications Linked</span>
-            <p style={{ fontSize: 22, fontWeight: 800, color: '#1e40af', margin: '4px 0 0' }}>{vaultSummary.linkedApplicationsCount}</p>
+          <Card style={{ padding: '14px 18px', border: '1px solid var(--accent-border)', background: 'var(--accent-subtle)' }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Applications Linked
+            </span>
+            <p className="font-tabular" style={{ fontSize: 22, fontWeight: 700, color: 'var(--primary)', margin: '4px 0 0' }}>
+              {vaultSummary.linkedApplicationsCount}
+            </p>
           </Card>
         </div>
       )}
 
       {/* Duplicate Document Conflict Dialog */}
       {duplicatePending && (
-        <div style={{
-          background: '#fffbeb',
-          border: '1px solid #fde68a',
-          borderRadius: 12,
-          padding: 18,
-          boxShadow: '0 2px 4px rgba(0,0,0,0.04)'
-        }}>
+        <div
+          style={{
+            background: 'var(--warning-subtle)',
+            border: '1px solid var(--warning-border)',
+            borderRadius: 'var(--radius-md)',
+            padding: 16
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-            <AlertTriangle size={22} color="#d97706" style={{ flexShrink: 0, marginTop: 2 }} />
+            <AlertTriangle size={20} color="var(--warning)" style={{ flexShrink: 0, marginTop: 2 }} />
             <div style={{ flex: 1 }}>
-              <h4 style={{ fontSize: 14, fontWeight: 700, color: '#92400e', margin: '0 0 4px' }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--warning)', margin: '0 0 4px' }}>
                 {duplicatePending.label} Already Exists in Vault
               </h4>
-              <p style={{ fontSize: 13, color: '#b45309', margin: '0 0 12px' }}>
+              <p style={{ fontSize: 13, color: 'var(--text-primary)', margin: '0 0 12px', lineHeight: 1.5 }}>
                 You already have a document registered under "{duplicatePending.label}". Would you like to replace the existing file with "{duplicatePending.file.name}"? Replaced files automatically preserve links to active applications.
               </p>
               <div style={{ display: 'flex', gap: 10 }}>
                 <Button
                   size="sm"
+                  variant="primary"
                   isLoading={uploading}
                   onClick={() => uploadFile(duplicatePending.file, duplicatePending.type, true)}
                 >
@@ -254,7 +285,10 @@ export function DocumentsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => { setDuplicatePending(null); setUploadType('') }}
+                  onClick={() => {
+                    setDuplicatePending(null)
+                    setUploadType('')
+                  }}
                 >
                   Keep Current File
                 </Button>
@@ -266,35 +300,28 @@ export function DocumentsPage() {
 
       {/* Dangerous Deletion Warning Dialog */}
       {deleteWarningDoc && (
-        <div style={{
-          background: '#fef2f2',
-          border: '1px solid #fecaca',
-          borderRadius: 12,
-          padding: 18,
-          boxShadow: '0 2px 4px rgba(0,0,0,0.04)'
-        }}>
+        <div
+          style={{
+            background: 'var(--error-subtle)',
+            border: '1px solid var(--error-border)',
+            borderRadius: 'var(--radius-md)',
+            padding: 16
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-            <AlertCircle size={22} color="#dc2626" style={{ flexShrink: 0, marginTop: 2 }} />
+            <AlertCircle size={20} color="var(--error)" style={{ flexShrink: 0, marginTop: 2 }} />
             <div style={{ flex: 1 }}>
-              <h4 style={{ fontSize: 14, fontWeight: 700, color: '#991b1b', margin: '0 0 4px' }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--error)', margin: '0 0 4px' }}>
                 Document Attached to Active Applications
               </h4>
-              <p style={{ fontSize: 13, color: '#b91c1c', margin: '0 0 12px' }}>
+              <p style={{ fontSize: 13, color: 'var(--text-primary)', margin: '0 0 12px', lineHeight: 1.5 }}>
                 "{deleteWarningDoc.label}" is currently referenced by: <strong>{deleteWarningDoc.activeApps.join(', ')}</strong>. Deleting this credential will remove it from those active submissions and may invalidate their completeness.
               </p>
               <div style={{ display: 'flex', gap: 10 }}>
-                <Button
-                  size="sm"
-                  style={{ background: '#dc2626', color: '#ffffff' }}
-                  onClick={confirmDangerousDelete}
-                >
+                <Button size="sm" variant="danger" onClick={confirmDangerousDelete}>
                   Confirm Delete & Detach
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setDeleteWarningDoc(null)}
-                >
+                <Button variant="outline" size="sm" onClick={() => setDeleteWarningDoc(null)}>
                   Cancel
                 </Button>
               </div>
@@ -304,9 +331,9 @@ export function DocumentsPage() {
       )}
 
       {/* Upload New Document Card */}
-      <Card style={{ padding: 20, border: '1px solid #e2e8f0', background: '#ffffff' }}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', margin: '0 0 14px' }}>
-          Add or Renew Document in Vault
+      <Card style={{ padding: 20, border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)' }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 14px', letterSpacing: '-0.01em' }}>
+          Add or Renew Credential in Vault
         </h3>
         <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: 240 }}>
@@ -315,7 +342,7 @@ export function DocumentsPage() {
               options={DOC_TYPES}
               placeholder="e.g. Income Certificate, Marksheet..."
               value={uploadType}
-              onChange={e => setUploadType(e.target.value)}
+              onChange={(e) => setUploadType(e.target.value)}
             />
           </div>
           <input
@@ -323,7 +350,7 @@ export function DocumentsPage() {
             type="file"
             accept=".jpg,.jpeg,.png,.webp,.pdf"
             style={{ display: 'none' }}
-            onChange={e => {
+            onChange={(e) => {
               const f = e.target.files?.[0]
               if (f) handleInitialUpload(f)
               if (e.target) e.target.value = ''
@@ -334,36 +361,37 @@ export function DocumentsPage() {
             disabled={!uploadType}
             onClick={() => fileRef.current?.click()}
             leftIcon={<Upload size={14} />}
-            style={{ height: 40 }}
+            variant="primary"
+            style={{ height: 38 }}
           >
             Choose & Upload File
           </Button>
         </div>
-        <p style={{ fontSize: 12, color: '#64748b', marginTop: 10 }}>
-          Accepted formats: PDF, JPEG, PNG, WebP · Max size: 5MB · Stored with server-side authentication
+        <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '10px 0 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Lock size={12} color="var(--text-muted)" /> Accepted formats: PDF, JPEG, PNG, WebP · Max size: 5MB · Stored with authenticated access
         </p>
       </Card>
 
       {/* Search and Filters */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 240 }}>
-          <div style={{ position: 'relative', width: '100%', maxWidth: 320 }}>
-            <Search size={14} color="#94a3b8" style={{ position: 'absolute', left: 10, top: 11 }} />
-            <input
-              type="text"
-              placeholder="Search documents or certificate IDs..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '7px 12px 7px 32px',
-                borderRadius: 8,
-                border: '1px solid #cbd5e1',
-                fontSize: 13,
-                outline: 'none'
-              }}
-            />
-          </div>
+        <div style={{ position: 'relative', width: '100%', maxWidth: 320 }}>
+          <Search size={14} color="var(--text-muted)" style={{ position: 'absolute', left: 10, top: 11 }} />
+          <input
+            type="text"
+            placeholder="Search documents or certificate IDs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '7px 12px 7px 32px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-subtle)',
+              background: 'var(--bg-surface)',
+              color: 'var(--text-primary)',
+              fontSize: 13,
+              outline: 'none'
+            }}
+          />
         </div>
 
         <div style={{ display: 'flex', gap: 6 }}>
@@ -372,24 +400,28 @@ export function DocumentsPage() {
             { key: 'VERIFIED', label: 'Verified' },
             { key: 'PENDING', label: 'Pending' },
             { key: 'EXPIRING', label: 'Expiring Soon' }
-          ].map(f => (
-            <button
-              key={f.key}
-              onClick={() => setStatusFilter(f.key)}
-              style={{
-                padding: '4px 12px',
-                borderRadius: 16,
-                fontSize: 12,
-                fontWeight: 600,
-                border: statusFilter === f.key ? '1px solid #1e40af' : '1px solid #e2e8f0',
-                background: statusFilter === f.key ? '#eff6ff' : '#ffffff',
-                color: statusFilter === f.key ? '#1e40af' : '#64748b',
-                cursor: 'pointer'
-              }}
-            >
-              {f.label}
-            </button>
-          ))}
+          ].map((f) => {
+            const isActive = statusFilter === f.key
+            return (
+              <button
+                key={f.key}
+                onClick={() => setStatusFilter(f.key)}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: 12,
+                  fontWeight: isActive ? 600 : 500,
+                  border: `1px solid ${isActive ? 'var(--accent-border)' : 'var(--border-subtle)'}`,
+                  background: isActive ? 'var(--accent-subtle)' : 'var(--bg-surface)',
+                  color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  transition: 'all var(--transition-fast)'
+                }}
+              >
+                {f.label}
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -403,66 +435,98 @@ export function DocumentsPage() {
           description="Upload essential documents like Aadhaar, Class 10 Marksheet, and Income Certificate so they can be instantly attached to scholarship applications."
         />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {filteredDocs.map((doc, i) => {
             const isExpired = doc.status === 'EXPIRED' || (doc.expiryDate && new Date(doc.expiryDate).getTime() < Date.now())
-            const isExpiringSoon = doc.expiryDate && !isExpired && (new Date(doc.expiryDate).getTime() - Date.now()) <= 30 * 86400000
+            const isExpiringSoon = doc.expiryDate && !isExpired && new Date(doc.expiryDate).getTime() - Date.now() <= 30 * 86400000
 
             return (
               <motion.div key={doc.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
-                <Card style={{ padding: '16px 20px', border: '1px solid #e2e8f0', background: '#ffffff' }}>
+                <Card style={{ padding: '16px 18px', border: '1px solid var(--border-subtle)', background: 'var(--bg-surface)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-                      <div style={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: 10,
-                        background: doc.status === 'VERIFIED' ? '#ecfdf5' : doc.status === 'REJECTED' ? '#fef2f2' : '#f8fafc',
-                        border: doc.status === 'VERIFIED' ? '1px solid #a7f3d0' : doc.status === 'REJECTED' ? '1px solid #fecaca' : '1px solid #e2e8f0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0
-                      }}>
-                        {SI[doc.status] ?? <FileText size={18} color="#64748b" />}
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 'var(--radius-md)',
+                          background:
+                            doc.status === 'VERIFIED'
+                              ? 'var(--success-subtle)'
+                              : doc.status === 'REJECTED'
+                              ? 'var(--error-subtle)'
+                              : 'var(--bg-canvas)',
+                          border: `1px solid ${
+                            doc.status === 'VERIFIED'
+                              ? 'var(--success-border)'
+                              : doc.status === 'REJECTED'
+                              ? 'var(--error-border)'
+                              : 'var(--border-subtle)'
+                          }`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}
+                      >
+                        {SI[doc.status] ?? <FileText size={18} color="var(--text-muted)" />}
                       </div>
 
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                          <p style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', margin: 0 }}>{doc.label}</p>
+                          <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
+                            {doc.label}
+                          </p>
                           <StatusBadge status={doc.status} />
-                          {doc.isMetadataConfirmed && (
-                            <Badge variant="success">Confirmed</Badge>
-                          )}
-                          {isExpired && (
-                            <Badge variant="error">Expired</Badge>
-                          )}
-                          {isExpiringSoon && !isExpired && (
-                            <Badge variant="warning">Expiring Soon</Badge>
-                          )}
+                          {doc.isMetadataConfirmed && <Badge variant="success" size="sm">Confirmed</Badge>}
+                          {isExpired && <Badge variant="error" size="sm">Expired</Badge>}
+                          {isExpiringSoon && !isExpired && <Badge variant="warning" size="sm">Expiring Soon</Badge>}
                         </div>
 
-                        <p style={{ fontSize: 12, color: '#64748b', margin: '3px 0 0' }}>
+                        <p className="font-tabular" style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '3px 0 0' }}>
                           {doc.fileName} · {(doc.fileSize / 1024).toFixed(0)} KB · Uploaded {new Date(doc.createdAt).toLocaleDateString('en-IN')}
                         </p>
 
                         {/* Metadata row: Document ID, Issue Date, Expiry Date */}
-                        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 6, fontSize: 11, color: '#475569' }}>
+                        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 4, fontSize: 11, color: 'var(--text-secondary)' }}>
                           {doc.documentNumber && (
-                            <span><strong>Cert #:</strong> {doc.documentNumber}</span>
+                            <span>
+                              <strong style={{ color: 'var(--text-primary)' }}>Cert #:</strong> {doc.documentNumber}
+                            </span>
                           )}
                           {doc.issueDate && (
-                            <span><strong>Issued:</strong> {doc.issueDate.slice(0, 10)}</span>
+                            <span className="font-tabular">
+                              <strong style={{ color: 'var(--text-primary)' }}>Issued:</strong> {doc.issueDate.slice(0, 10)}
+                            </span>
                           )}
                           {doc.expiryDate && (
-                            <span style={{ color: isExpired ? '#dc2626' : (isExpiringSoon ? '#d97706' : '#475569') }}>
+                            <span
+                              className="font-tabular"
+                              style={{
+                                color: isExpired ? 'var(--error)' : isExpiringSoon ? 'var(--warning)' : 'var(--text-secondary)'
+                              }}
+                            >
                               <strong>Expires:</strong> {doc.expiryDate.slice(0, 10)}
                             </span>
                           )}
                         </div>
 
                         {doc.rejectionReason && (
-                          <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '2px 8px', borderRadius: 6, fontSize: 12, fontWeight: 500 }}>
+                          <div
+                            style={{
+                              marginTop: 6,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 6,
+                              background: 'var(--error-subtle)',
+                              border: '1px solid var(--error-border)',
+                              color: 'var(--error)',
+                              padding: '2px 8px',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: 12,
+                              fontWeight: 500
+                            }}
+                          >
                             <AlertCircle size={12} /> Rejection reason: {doc.rejectionReason}
                           </div>
                         )}
@@ -493,7 +557,7 @@ export function DocumentsPage() {
                         size="sm"
                         onClick={() => checkAndDeleteDoc(doc)}
                         leftIcon={<Trash2 size={13} />}
-                        style={{ color: '#dc2626' }}
+                        style={{ color: 'var(--error)' }}
                       >
                         Delete
                       </Button>

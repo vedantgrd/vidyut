@@ -75,17 +75,17 @@ Every year, millions of Indian students miss life-changing scholarships. Not bec
 | 🎯 | **Eligibility Matcher** | Evaluates family income, caste category, domicile state, gender, disability, minority status, and academic cutoffs (percentage/CGPA) into a real **0–100%** score. |
 | 🧭 | **4-Step Application Wizard** | Prefilled dossier → 1-click vault linking → honesty declaration → instant tracking ID. |
 | 🤖 | **Context-Aware AI Assistant** | Reads your real profile, family income, and uploaded credentials to explain match requirements without hallucinating. |
-| 💸 | **DBT Tracking** | Real-time audit trail of scholarship tranches, bank reference codes, and installment dates. |
+| 💸 | **Multi-Tranche DBT Milestone Tracker** | Real-time payout timeline with individual installment amounts, due dates, tranche status (`SCHEDULED`, `DISBURSED`, `CANCELLED`), bank UTR reference tracking, and settlement progress bars. |
 
 ### 🏛️ For Administrators & Reviewers
 
 | | Feature | What it does |
 |:-:|---|---|
-| 📊 | **Operations Center** | Platform metrics: registered students, active schemes, review backlog, pending verifications. |
+| 📊 | **Operations Center** | Platform metrics: registered students, active schemes, review backlog, pending verifications, and DBT treasury payout reconciliation. |
 | 🗂️ | **Candidate Dossier** | Profile, family finances, and multi-tier academic history in one unified view. |
 | ✅ | **Verification Queue** | Authenticated document streaming with one-click verify, and mandatory rationale on rejection. |
 | 🕓 | **Status Audit & Notes** | A complete chronological history of every status change, with reviewer notes. |
-| 🏦 | **DBT Disbursement Controls** | Record installments, transaction reference codes, and treasury advice slips directly on the candidate record. |
+| 🏦 | **Multi-Installment DBT Disbursement Engine** | Split approved awards into multiple staged tranches (Single Lumpsum, 50/50 Bi-Annual Split, or Custom Schedules). Features strict balance reconciliation (Disbursed + Pending = Approved Award), tranche state machine (`SCHEDULED` → `DISBURSED`), and individual bank UTR audit logging. |
 
 ### 🔄 Application Lifecycle
 
@@ -96,9 +96,12 @@ stateDiagram-v2
     DRAFT --> SUBMITTED: Student submits
     SUBMITTED --> DOCUMENTS_VERIFIED: Officer verifies docs
     DOCUMENTS_VERIFIED --> UNDER_REVIEW: Review begins
-    UNDER_REVIEW --> APPROVED: Approved
+    UNDER_REVIEW --> APPROVED: Committee approval
     UNDER_REVIEW --> REJECTED: Rejected
-    APPROVED --> [*]: DBT tranches disbursed
+    APPROVED --> TRANCHE_SCHEDULED: Configure installments
+    TRANCHE_SCHEDULED --> TRANCHE_DISBURSED: Release tranche (UTR)
+    TRANCHE_DISBURSED --> SETTLED: 100% award disbursed
+    SETTLED --> [*]
     REJECTED --> [*]
 ```
 
@@ -133,6 +136,10 @@ stateDiagram-v2
 
 ![Scholarship Discovery](docs/screenshots/06-scholarship-discovery.png)
 
+**6 · Smart Scholarship Calendar & Agenda** — synchronized deadline calendar, date-only deadline math, urgent task checklist, and 1-click `.ics` calendar sync.
+
+![Smart Scholarship Calendar](docs/screenshots/12-scholarship-calendar.png)
+
 </details>
 
 <details open>
@@ -140,15 +147,15 @@ stateDiagram-v2
 
 <br/>
 
-**6 · Admin control center** — active schemes, pending review backlog, and recent submissions at a glance.
+**7 · Admin control center** — active schemes, pending review backlog, and DBT treasury reconciliation metrics.
 
 ![Admin Dashboard](docs/screenshots/08-admin-dashboard.png)
 
-**7 · Application review & DBT disbursement** — full candidate dossier, document inspection, reviewer notes, status transitions, and payment tranches.
+**8 · Multi-Installment Disbursement & DBT Treasury** — approved award balance reconciliation, configurable tranches (1-time or 50/50 split), and individual tranche disbursement with UTR tracking.
 
-![Admin Application Review](docs/screenshots/10-admin-application-review.png)
+![Admin Application Review & Multi-Installment](docs/screenshots/10-admin-application-review.png)
 
-**8 · Document verification queue** — preview certificates, then verify or reject with feedback.
+**9 · Document verification queue** — preview certificates, then verify or reject with feedback.
 
 ![Document Verification Queue](docs/screenshots/11-admin-documents-verification.png)
 
@@ -355,50 +362,123 @@ node scripts/capture-screenshots.js
 
 ---
 
-## 🌐 Production Deployment Guide
+## 🌐 Production Deployment Guide (Neon + Render + Vercel)
 
-### Architecture at a Glance
-- **Frontend (`apps/web`)**: Static SPA built with Vite. Can be deployed to any static host (Vercel, Netlify, Cloudflare Pages, AWS S3 + CloudFront, or Nginx).
-- **Backend (`apps/server`)**: Node.js HTTP service running Hono v4. Can be hosted on Docker, AWS ECS/EC2, Render, Railway, or VPS.
-- **Database (`PostgreSQL 16`)**: Managed PostgreSQL instance (AWS RDS, Neon, Supabase, Railway) or Dockerized container.
+Vidyut's production prototype runs on a modern, decoupled cloud architecture:
+1. **Database**: Serverless PostgreSQL on [Neon](https://neon.tech/)
+2. **Backend API**: Node.js + Hono v4 container on [Render](https://render.com/)
+3. **Frontend SPA**: React 19 + Vite static web app on [Vercel](https://vercel.com/)
 
-### Step-by-Step Deployment
+---
 
-#### 1. Database Provisioning & Migrations
-Set `DATABASE_URL` in your production environment and deploy schema migrations:
-```bash
-cd apps/server
-npx prisma migrate deploy
-# Optional: Seed initial national and state scholarship catalog
-npm run db:seed
-```
+### Step 1: Database Setup & Migrations on Neon
 
-#### 2. Backend Server Deployment
-1. Set the production environment variables:
-   - `DATABASE_URL`: Connection string to your production PostgreSQL database.
-   - `JWT_ACCESS_SECRET`: 64-character cryptographically random string (`openssl rand -base64 48`).
-   - `JWT_REFRESH_SECRET`: Separate 64-character cryptographically random string.
-   - `FRONTEND_URL`: URL of your deployed frontend (e.g., `https://vidyut.yourdomain.in`).
-   - `PORT`: `3001` (or provider's default port).
-   - `NODE_ENV`: `production`.
-   - `STORAGE_PATH`: Path to persistent disk volume mount (e.g., `/mnt/data/uploads`).
-2. Build and run:
+1. **Create a Neon Project**:
+   - Sign in to the [Neon Console](https://console.neon.tech/) and create a new project (e.g. `vidyut-prod`).
+   - Select the PostgreSQL 16 engine and your preferred region (e.g., `ap-southeast-1` or `us-east-2`).
+
+2. **Retrieve Connection String**:
+   - In your Neon Dashboard, copy the connection string under **Connection details**:
+     ```env
+     DATABASE_URL="postgresql://neondb_owner:<PASSWORD>@<EP_HOST>.neon.tech/neondb?sslmode=require"
+     ```
+
+3. **Deploy Schema Migrations & Seed Catalog**:
+   Run migrations from your terminal against the Neon production database:
    ```bash
-   npm run build --workspace=apps/server
-   npm run start --workspace=apps/server
-   ```
-3. Health check verification: `GET https://api.yourdomain.in/health` returns `{"status":"ok"}`.
+   cd apps/server
 
-#### 3. Frontend Deployment
-1. Set `VITE_API_URL` to point to your backend API base:
-   ```env
-   VITE_API_URL="https://api.yourdomain.in/api/v1"
+   # 1. Run all Prisma migrations against Neon (creates multi-installment DBT tranches, vault, calendar tasks, audit logs)
+   DATABASE_URL="postgresql://neondb_owner:<PASSWORD>@<EP_HOST>.neon.tech/neondb?sslmode=require" npx prisma migrate deploy
+
+   # 2. (Optional) Seed standard national/state scholarships and demo accounts:
+   DATABASE_URL="postgresql://neondb_owner:<PASSWORD>@<EP_HOST>.neon.tech/neondb?sslmode=require" npm run db:seed
    ```
-2. Build production bundle:
-   ```bash
-   npm run build --workspace=apps/web
+
+---
+
+### Step 2: Backend API Deployment on Render
+
+1. **Create a New Web Service**:
+   - In the [Render Dashboard](https://dashboard.render.com/), click **New +** → **Web Service**.
+   - Connect your Vidyut Git repository.
+
+2. **Configure Service Settings**:
+   - **Name**: `vidyut-api`
+   - **Region**: Choose the region closest to your Neon database.
+   - **Branch**: `main` (or your active release branch).
+   - **Root Directory**: Leave blank (monorepo root `./`).
+   - **Runtime**: `Node`.
+   - **Build Command**:
+     ```bash
+     npm install && npx prisma generate --schema=apps/server/prisma/schema.prisma && npm run build --workspace=apps/server
+     ```
+   - **Start Command**:
+     ```bash
+     node apps/server/dist/index.js
+     ```
+
+3. **Set Environment Variables**:
+   In Render's **Environment** tab, configure the following variables:
+   | Key | Value | Notes |
+   |---|---|---|
+   | `DATABASE_URL` | `postgresql://neondb_owner:<PASSWORD>@<EP_HOST>.neon.tech/neondb?sslmode=require` | Your Neon connection string |
+   | `JWT_ACCESS_SECRET` | *(64-char random hex string)* | Generate: `openssl rand -hex 32` |
+   | `JWT_REFRESH_SECRET` | *(64-char random hex string)* | Distinct secret from access token |
+   | `FRONTEND_URL` | `https://vidyut.vercel.app` | Your Vercel frontend domain (authorizes CORS) |
+   | `PORT` | `3001` (or Render's assigned port) | Backend listen port |
+   | `NODE_ENV` | `production` | Production mode |
+   | `STORAGE_PATH` | `/var/data/uploads` | Path for student document uploads |
+
+4. **Add Persistent Disk (For Document Vault)**:
+   - In Render, navigate to **Disks** → **Add Disk**.
+   - **Mount Path**: `/var/data/uploads`
+   - **Size**: 1 GB to 10 GB
+   *(This ensures uploaded Aadhaar, marksheets, and certificates persist safely across server restarts).*
+
+5. **Deploy & Verify Health**:
+   - Click **Create Web Service**. Once deployed, verify in terminal:
+     ```bash
+     curl https://vidyut-api.onrender.com/health
+     # Expected output: {"status":"ok"}
+     ```
+
+---
+
+### Step 3: Frontend Deployment on Vercel
+
+1. **Import Project to Vercel**:
+   - In the [Vercel Dashboard](https://vercel.com/dashboard), click **Add New...** → **Project**.
+   - Select your Vidyut repository.
+
+2. **Configure Build & Output Settings**:
+   - **Framework Preset**: `Vite`
+   - **Root Directory**: `apps/web`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+   - **Install Command**: `npm install`
+
+3. **Set Environment Variables**:
+   In Vercel's **Environment Variables** tab:
+   | Key | Value |
+   |---|---|
+   | `VITE_API_URL` | `https://vidyut-api.onrender.com/api/v1` |
+
+4. **SPA Client Routing**:
+   Vidyut includes `apps/web/vercel.json` preconfigured with single-page rewrites:
+   ```json
+   {
+     "rewrites": [
+       { "source": "/(.*)", "destination": "/index.html" }
+     ]
+   }
    ```
-3. Deploy the resulting `apps/web/dist/` directory to your static hosting provider with SPA fallback routing to `index.html`.
+   This ensures deep routes like `/admin/applications/:id` and `/dashboard/calendar` load without 404 errors.
+
+5. **Deploy & Verify**:
+   - Click **Deploy**.
+   - Open your production URL (`https://vidyut.vercel.app`).
+   - Sign in as Admin (`admin@vidyut.in`) or Student (`demo@vidyut.in`) to verify live functionality and multi-installment disbursement schedules.
 
 ---
 

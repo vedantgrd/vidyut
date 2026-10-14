@@ -1,31 +1,51 @@
-import React from 'react';
-import clsx from 'clsx';
+import React from 'react'
 
 export interface LoadingSkeletonProps {
-  className?: string;
-  variant?: 'text' | 'title' | 'circle' | 'rect';
+  className?: string
+  variant?: 'text' | 'title' | 'circle' | 'rect'
+  width?: string | number
+  height?: string | number
+  borderRadius?: string | number
+  style?: React.CSSProperties
 }
 
 export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
-  className,
-  variant = 'rect'
+  className = '',
+  variant = 'rect',
+  width,
+  height,
+  borderRadius,
+  style,
 }) => {
-  const baseStyles = 'bg-[var(--surface-3)] animate-pulse border border-[var(--border-subtle)]';
+  const getDefaultDims = () => {
+    switch (variant) {
+      case 'text':
+        return { width: width ?? '100%', height: height ?? 14, borderRadius: borderRadius ?? 4 }
+      case 'title':
+        return { width: width ?? '60%', height: height ?? 22, borderRadius: borderRadius ?? 6 }
+      case 'circle':
+        return { width: width ?? 36, height: height ?? 36, borderRadius: borderRadius ?? '50%' }
+      case 'rect':
+      default:
+        return { width: width ?? '100%', height: height ?? 80, borderRadius: borderRadius ?? 8 }
+    }
+  }
 
-  const variants = {
-    text: 'h-4 w-full rounded-md',
-    title: 'h-6 w-2/3 rounded-lg',
-    circle: 'rounded-full shrink-0',
-    rect: 'h-32 w-full rounded-2xl',
-  };
+  const dims = getDefaultDims()
 
   return (
     <div
-      className={clsx(
-        baseStyles,
-        variants[variant],
-        className
-      )}
+      className={className}
+      style={{
+        width: dims.width,
+        height: dims.height,
+        borderRadius: dims.borderRadius,
+        backgroundColor: 'var(--surface-2, #F7F8F9)',
+        border: '1px solid var(--border-subtle, #E7E9EE)',
+        animation: 'skeletonPulse 1.5s ease-in-out infinite',
+        flexShrink: 0,
+        ...style,
+      }}
     />
-  );
-};
+  )
+}

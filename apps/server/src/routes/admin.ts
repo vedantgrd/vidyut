@@ -3,15 +3,62 @@ import{zValidator}from'@hono/zod-validator'
 import slugify from'slugify'
 import{prisma}from'../lib/prisma.js'
 import{authMiddleware,adminMiddleware,adminOnlyMiddleware}from'../middleware/auth.js'
-import{createScholarshipSchema,updateScholarshipSchema,reviewApplicationSchema,disburseApplicationSchema}from'../validators/schemas.js'
+import{createScholarshipSchema,updateScholarshipSchema,reviewApplicationSchema,disburseApplicationSchema,configureInstallmentScheduleSchema}from'../validators/schemas.js'
 import type{ApplicationStatus}from'../types/index.js'
 const admin=new Hono<{Variables:{userId:string;role:string}}>()
 admin.use('*',authMiddleware,adminMiddleware)
 admin.get('/dashboard',async(c)=>{
-  const[ts,tsc,as2,ta,pr,pd]=await Promise.all([prisma.user.count({where:{role:'STUDENT'}}),prisma.scholarship.count(),prisma.scholarship.count({where:{status:'ACTIVE'}}),prisma.application.count(),prisma.application.count({where:{status:{in:['SUBMITTED','UNDER_REVIEW']}}}),prisma.document.count({where:{status:'PENDING'}})])
+  const[ts,tsc,as2,ta,pr,pd]=await Promise.all([
+    prisma.user.count({where:{role:'STUDENT'}}),
+    prisma.scholarship.count(),
+    prisma.scholarship.count({where:{status:'ACTIVE'}}),
+    prisma.application.count(),
+    prisma.application.count({where:{status:{in:['SUBMITTED','UNDER_REVIEW']}}}),
+    prisma.document.count({where:{status:'PENDING'}})
+  ])
   const abs=await prisma.application.groupBy({by:['status'],_count:true})
-  const recent=await prisma.application.findMany({take:10,orderBy:{lastActivityAt:'desc'},include:{user:{select:{fullName:true,email:true}},scholarship:{select:{name:true}}}})
-  return c.json({stats:{totalStudents:ts,totalScholarships:tsc,activeScholarships:as2,totalApplications:ta,pendingReview:pr,pendingDocuments:pd},applicationsByStatus:abs,recentApplications:recent})
+
+  // Financial and DBT aggregation
+  const approvedApps=await prisma.application.findMany({
+    where:{status:'APPROVED'},
+    select:{id:true,scholarship:{select:{amount:true}}}
+  })
+  const totalApprovedAwardsValue=approvedApps.reduce((acc,a)=>acc+(a.scholarship?.amount||0),0)
+
+  const disbursements=await prisma.applicationDisbursement.findMany({
+    select:{amount:true,status:true}
+  })
+  const totalDisbursedValue=disbursements
+    .filter(d=>d.status==='DISBURSED')
+    .reduce((acc,d)=>acc+d.amount,0)
+  const pendingDisbursementValue=Math.max(0,totalApprovedAwardsValue-totalDisbursedValue)
+  const disbursedCount=disbursements.filter(d=>d.status==='DISBURSED').length
+
+  const recent=await prisma.application.findMany({
+    take:10,
+    orderBy:{lastActivityAt:'desc'},
+    include:{
+      user:{select:{fullName:true,email:true}},
+      scholarship:{select:{name:true,amount:true}},
+      disbursements:{select:{amount:true,status:true,referenceCode:true,disbursedAt:true}}
+    }
+  })
+  return c.json({
+    stats:{
+      totalStudents:ts,
+      totalScholarships:tsc,
+      activeScholarships:as2,
+      totalApplications:ta,
+      pendingReview:pr,
+      pendingDocuments:pd,
+      totalApprovedAwardsValue,
+      totalDisbursedValue,
+      pendingDisbursementValue,
+      disbursedCount
+    },
+    applicationsByStatus:abs,
+    recentApplications:recent
+  })
 })
 admin.get('/scholarships',async(c)=>c.json({scholarships:await prisma.scholarship.findMany({include:{_count:{select:{applications:true,eligibilityRules:true,requiredDocuments:true}}},orderBy:{createdAt:'desc'}})}))
 admin.get('/scholarships/:id',async(c)=>{
@@ -63,6 +110,104 @@ admin.get('/applications/:id',async(c)=>{
   return c.json({application:app,studentProfile:p,familyInfo:fi,academicRecords:ar})
 })
 
+admin.post('/applications/:id/schedule',zValidator('json',configureInstallmentScheduleSchema),async(c)=>{
+  const adminId=c.get('userId'),id=c.req.param('id')
+  const{installments}=c.req.valid('json')
+
+  const app=await prisma.application.findUnique({
+    where:{id},
+    include:{scholarship:true,disbursements:{orderBy:{installmentNo:'asc'}}}
+  })
+  if(!app)return c.json({error:'Application not found'},404)
+  if(app.status!=='APPROVED')return c.json({error:'Disbursement schedule can only be configured for APPROVED applications'},400)
+
+  // Invariant 1: Positive amounts
+  for(const inst of installments){
+    if(!Number.isInteger(inst.amount)||inst.amount<=0){
+      return c.json({error:`Installment #${inst.installmentNo} must be a positive integer amount`},400)
+    }
+  }
+
+  // Invariant 2: Total allocation must exactly reconcile with approved award
+  const totalAllocated=installments.reduce((sum,inst)=>sum+inst.amount,0)
+  if(totalAllocated!==app.scholarship.amount){
+    return c.json({
+      error:`Schedule total (₹${totalAllocated.toLocaleString('en-IN')}) does not reconcile with approved award (₹${app.scholarship.amount.toLocaleString('en-IN')}). Difference: ₹${Math.abs(app.scholarship.amount-totalAllocated).toLocaleString('en-IN')}`
+    },400)
+  }
+
+  // Invariant 3: Preserving already disbursed installments
+  const alreadyDisbursed=app.disbursements.filter(d=>d.status==='DISBURSED')
+  for(const disbursed of alreadyDisbursed){
+    const matching=installments.find(inst=>inst.installmentNo===disbursed.installmentNo)
+    if(!matching){
+      return c.json({
+        error:`Installment #${disbursed.installmentNo} has already been disbursed and cannot be removed from schedule`
+      },400)
+    }
+    if(matching.amount!==disbursed.amount){
+      return c.json({
+        error:`Installment #${disbursed.installmentNo} was already disbursed (₹${disbursed.amount.toLocaleString('en-IN')}) and its amount cannot be modified`
+      },400)
+    }
+  }
+
+  // Atomically recreate pending installments
+  await prisma.$transaction(async(tx)=>{
+    await tx.applicationDisbursement.deleteMany({
+      where:{
+        applicationId:id,
+        status:'PENDING'
+      }
+    })
+
+    for(const inst of installments){
+      const isPaid=alreadyDisbursed.some(d=>d.installmentNo===inst.installmentNo)
+      if(!isPaid){
+        await tx.applicationDisbursement.create({
+          data:{
+            applicationId:id,
+            installmentNo:inst.installmentNo,
+            amount:inst.amount,
+            status:'PENDING',
+            notes:inst.notes||inst.name||`Installment ${inst.installmentNo}`
+          }
+        })
+      }
+    }
+
+    if(installments.length>1){
+      await tx.scholarship.update({
+        where:{id:app.scholarshipId},
+        data:{paymentType:'INSTALLMENTS'}
+      })
+    }
+
+    await tx.applicationStatusHistory.create({
+      data:{
+        applicationId:id,
+        fromStatus:app.status as ApplicationStatus,
+        toStatus:app.status as ApplicationStatus,
+        changedByUserId:adminId,
+        note:`Configured ${installments.length}-installment schedule totaling ₹${totalAllocated.toLocaleString('en-IN')}`
+      }
+    })
+  })
+
+  const updated=await prisma.applicationDisbursement.findMany({
+    where:{applicationId:id},
+    orderBy:{installmentNo:'asc'}
+  })
+
+  return c.json({
+    message:'Disbursement schedule saved and reconciled successfully',
+    schedule:updated,
+    disbursements:updated,
+    totalAllocated,
+    approvedAward:app.scholarship.amount
+  },200)
+})
+
 admin.post('/applications/:id/disburse',zValidator('json',disburseApplicationSchema),async(c)=>{
   const adminId=c.get('userId'),id=c.req.param('id')
   const{installmentNo,installmentId,amount,referenceCode,notes}=c.req.valid('json')
@@ -82,20 +227,46 @@ admin.post('/applications/:id/disburse',zValidator('json',disburseApplicationSch
 
   const generatedRef=referenceCode?.trim()||`DBT-${new Date().getFullYear()}-${Math.floor(100000+Math.random()*900000)}`
 
-  // Create disbursement in transaction and update application totals
+  // Create or update disbursement in transaction and update application totals
   const result=await prisma.$transaction(async(tx)=>{
-    const dis=await tx.applicationDisbursement.create({
-      data:{
+    // Check if there is an existing PENDING installment for this application
+    const existingPending=await tx.applicationDisbursement.findFirst({
+      where:{
         applicationId:id,
-        installmentId:installmentId??null,
-        installmentNo:installmentNo??null,
-        amount,
-        status:'DISBURSED',
-        referenceCode:generatedRef,
-        notes:notes??null,
-        disbursedAt:new Date()
+        status:'PENDING',
+        OR:[
+          ...(installmentId?[{installmentId}]:[]),
+          ...(installmentNo?[{installmentNo}]:[])
+        ]
       }
     })
+
+    let dis
+    if(existingPending){
+      dis=await tx.applicationDisbursement.update({
+        where:{id:existingPending.id},
+        data:{
+          amount,
+          status:'DISBURSED',
+          referenceCode:generatedRef,
+          notes:notes??existingPending.notes,
+          disbursedAt:new Date()
+        }
+      })
+    }else{
+      dis=await tx.applicationDisbursement.create({
+        data:{
+          applicationId:id,
+          installmentId:installmentId??null,
+          installmentNo:installmentNo??null,
+          amount,
+          status:'DISBURSED',
+          referenceCode:generatedRef,
+          notes:notes??null,
+          disbursedAt:new Date()
+        }
+      })
+    }
 
     const newTotal=alreadyDisbursed+amount
     const isFullyPaid=newTotal>=app.scholarship.amount

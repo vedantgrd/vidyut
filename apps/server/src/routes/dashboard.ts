@@ -115,6 +115,15 @@ dashboard.get('/home',async(c)=>{
     },
     unreadNotifications:uc,
     eligibleScholarships:eligible,
+    pipeline: {
+      draft: ta.filter(a => a.status === 'DRAFT').length,
+      submitted: ta.filter(a => a.status === 'SUBMITTED' || a.status === 'DOCUMENTS_VERIFIED').length,
+      underReview: ta.filter(a => a.status === 'UNDER_REVIEW').length,
+      actionRequired: ta.filter(a => a.status === 'ADDITIONAL_INFO_REQUESTED').length,
+      approved: approved.length,
+      rejected: ta.filter(a => a.status === 'REJECTED').length,
+      total: ta.length
+    },
     activeApplications:active.map((a:AR)=>({id:a.id,scholarshipName:a.scholarship.name,status:a.status,completionPercent:a.completionPercent,deadline:a.scholarship.deadline})),
     approvedApplications:approved.map((a:AR)=>({id:a.id,scholarshipName:a.scholarship.name,amount:a.scholarship.amount,disbursedAmount:a.disbursedAmount||0,disbursementStatus:a.disbursementStatus,paymentType:a.scholarship.paymentType})),
     recentActivity:ta.slice(0,5).map((a:AR)=>({id:a.id,title:`Application ${a.status.toLowerCase().replace(/_/g,' ')}`,description:a.scholarship.name,date:a.lastActivityAt,status:a.status})),

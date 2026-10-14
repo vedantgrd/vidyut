@@ -101,17 +101,50 @@ export const CONTEXTUAL_MESSAGES: Record<string, string[]> = {
     'Polishing your top scholarship recommendations...',
     'Checking eligibility criteria against the stars...',
   ],
+  scholarship: [
+    'Fetching scheme guidelines and eligibility criteria...',
+    'Analyzing grant requirements against your profile...',
+    'Retrieving official scholarship source data...',
+  ],
   applications: [
     'Fetching your application timeline and DBT statuses...',
     'Synchronizing your grant submissions with the portal...',
     'Checking review milestones. Hang tight...',
     'Retrieving your application dossiers...',
   ],
+  application: [
+    'Compiling your candidate dossier...',
+    'Validating attached credentials from your vault...',
+    'Checking preflight readiness indicators...',
+  ],
   documents: [
     'Unlocking your encrypted document vault...',
     'Verifying digital signatures and checksums...',
     'Retrieving Aadhaar and income certificates securely...',
     'Preparing your high-trust document records...',
+  ],
+  dashboard: [
+    'Synthesizing your scholarship command center...',
+    'Calculating profile completeness and active deadlines...',
+    'Checking for newly matched opportunities...',
+  ],
+  calendar: [
+    'Syncing scholarship deadlines and agenda events...',
+    'Arranging your personal milestone timeline...',
+    'Double-checking verified scheme closing dates...',
+  ],
+  profile: [
+    'Loading your candidate identity dossier...',
+    'Calculating eligibility readiness score...',
+    'Retrieving verified academic and family records...',
+  ],
+  settings: [
+    'Retrieving notification and security preferences...',
+    'Preparing your personalized account controls...',
+  ],
+  notifications: [
+    'Checking for incoming grant alerts and verification updates...',
+    'Syncing your inbox with scholarship authorities...',
   ],
   admin: [
     'Crunching administrative analytics and reviewer queues...',
@@ -137,8 +170,21 @@ export interface PageSpinnerProps {
   color?: string
   /** Minimum container height (default: '50vh') */
   minHeight?: string | number
-  /** Context to pick specific witty messages from (e.g. 'scholarships', 'documents', 'admin', 'applications') */
-  context?: 'general' | 'scholarships' | 'applications' | 'documents' | 'admin' | 'auth'
+  /** Context to pick specific witty messages from */
+  context?:
+    | 'general'
+    | 'scholarships'
+    | 'scholarship'
+    | 'applications'
+    | 'application'
+    | 'documents'
+    | 'dashboard'
+    | 'calendar'
+    | 'profile'
+    | 'settings'
+    | 'notifications'
+    | 'admin'
+    | 'auth'
   /** Custom list of messages to cycle through */
   messages?: string[]
   /** Whether to pick a random starting message instead of starting from the first one */

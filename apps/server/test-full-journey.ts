@@ -478,6 +478,74 @@ async function run() {
     // ========================================================
     console.log('\n--- 7. Testing DBT Disbursement & Financial Audit Trail ---')
 
+    // 7.0a Schedule Validation: Over-allocation rejection (₹15,000 + ₹10,000 = ₹25,000 > ₹20,000 award)
+    const overScheduleRes = await fetch(`${API_BASE}/admin/applications/${testAppId}/schedule`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({
+        installments: [
+          { installmentNo: 1, amount: 15000, name: 'Tranche 1' },
+          { installmentNo: 2, amount: 10000, name: 'Tranche 2' }
+        ]
+      })
+    })
+    assert(overScheduleRes.status === 400, 'Over-allocated schedule rejected with 400 Bad Request')
+
+    // 7.0b Schedule Validation: Negative or non-positive amount rejection
+    const invalidAmountScheduleRes = await fetch(`${API_BASE}/admin/applications/${testAppId}/schedule`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({
+        installments: [
+          { installmentNo: 1, amount: -5000, name: 'Tranche 1' },
+          { installmentNo: 2, amount: 25000, name: 'Tranche 2' }
+        ]
+      })
+    })
+    assert(invalidAmountScheduleRes.status === 400, 'Non-positive installment amount rejected with 400 Bad Request')
+
+    // 7.0c Schedule Security: Student forbidden from configuring schedule
+    const forbiddenScheduleRes = await fetch(`${API_BASE}/admin/applications/${testAppId}/schedule`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${studentToken}`
+      },
+      body: JSON.stringify({
+        installments: [
+          { installmentNo: 1, amount: 10000, name: 'Tranche 1' },
+          { installmentNo: 2, amount: 10000, name: 'Tranche 2' }
+        ]
+      })
+    })
+    assert(forbiddenScheduleRes.status === 403, 'Unauthorized student blocked from schedule configuration HTTP 403')
+
+    // 7.0d Schedule Configuration: Valid 2-Tranche MahaDBT Schedule (₹10,000 + ₹10,000 = ₹20,000)
+    const validScheduleRes = await fetch(`${API_BASE}/admin/applications/${testAppId}/schedule`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({
+        installments: [
+          { installmentNo: 1, amount: 10000, name: 'MahaDBT Tranche 1: Semester Fees' },
+          { installmentNo: 2, amount: 10000, name: 'MahaDBT Tranche 2: Maintenance Allowance' }
+        ]
+      })
+    })
+    const validScheduleData = await validScheduleRes.json()
+    assert(validScheduleRes.status === 200, 'Valid 2-tranche schedule configured atomically HTTP 200')
+    assert(validScheduleData.disbursements?.length === 2, '2 scheduled installment tranches initialized')
+    assert(validScheduleData.disbursements[0].status === 'PENDING', 'Tranche 1 status initialized to PENDING')
+    assert(validScheduleData.disbursements[1].status === 'PENDING', 'Tranche 2 status initialized to PENDING')
+
     // 7.1 Disburse Installment 1 (₹10,000)
     const disburse1 = await fetch(`${API_BASE}/admin/applications/${testAppId}/disburse`, {
       method: 'POST',

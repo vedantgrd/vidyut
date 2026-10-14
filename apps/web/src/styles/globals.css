@@ -1,66 +1,111 @@
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg-base:#f8fafc;
-  --bg-subtle:#f1f5f9;
-  --surface-1:#ffffff;
-  --surface-2:#f8fafc;
-  --surface-hover:#f1f5f9;
-  
-  --border-subtle:#f1f5f9;
-  --border-default:#e2e8f0;
-  --border-strong:#cbd5e1;
-  
-  --text-primary:#0f172a;
-  --text-secondary:#475569;
-  --text-tertiary:#64748b;
-  --text-disabled:#94a3b8;
-  
-  --accent:#1e40af;
-  --accent-hover:#1d4ed8;
-  --accent-subtle:rgba(30, 64, 175, 0.08);
-  --accent-border:rgba(30, 64, 175, 0.25);
-  
-  --success:#059669;
-  --success-subtle:rgba(5, 150, 105, 0.08);
-  
-  --warning:#d97706;
-  --warning-subtle:rgba(217, 119, 6, 0.08);
-  
-  --error:#dc2626;
-  --error-subtle:rgba(220, 38, 38, 0.08);
-  
-  --info:#2563eb;
-  --info-subtle:rgba(37, 99, 235, 0.08);
-  
-  --radius-sm:6px;
-  --radius-md:10px;
-  --radius-lg:14px;
-  --radius-xl:20px;
-  --radius-2xl:28px;
-  --radius-full:9999px;
-  
-  --shadow-sm:0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md:0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-lg:0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  --shadow-xl:0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-  
-  --font-sans:'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --transition:150ms cubic-bezier(0.4, 0, 0.2, 1);
-  color-scheme:light;
+@import './variables.css';
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-html{font-family:var(--font-sans);-webkit-font-smoothing:antialiased;}
-body{background:var(--bg-base);color:var(--text-primary);min-height:100vh;line-height:1.5;}
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
 
-::-webkit-scrollbar{width:6px;height:6px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:var(--radius-full);}
-::-webkit-scrollbar-thumb:hover{background:#94a3b8;}
+/* Offset sticky header for smooth anchor scrolling */
+section[id], div[id] {
+  scroll-margin-top: 76px;
+}
 
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--radius-sm);}
-a{color:inherit;text-decoration:none;}
-::selection{background:rgba(30, 64, 175, 0.15);}
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: var(--leading-normal);
+  font-size: var(--text-base);
+  letter-spacing: var(--tracking-tight);
+}
 
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.animate-spin{animation:spin 0.7s linear infinite;}
+/* Tabular numerals for financial clarity (dates, amounts, counts, percentages) */
+.tabular-nums,
+[data-tabular="true"] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'cv05' 1, 'cv11' 1;
+}
+
+/* Minimal, elegant scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D1D5DF;
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A6AFBF;
+}
+
+/* Focus visibility for accessibility (WCAG 2.2 AA) */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+input, select, textarea {
+  font-family: inherit;
+}
+
+::selection {
+  background: rgba(49, 94, 170, 0.12);
+  color: var(--text-primary);
+}
+
+/* Animation utilities */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-spin {
+  animation: spin 0.75s linear infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

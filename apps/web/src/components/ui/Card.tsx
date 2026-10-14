@@ -1,29 +1,49 @@
-import{motion}from'framer-motion'
+import React from 'react'
 
-interface CardProps{
-  children:React.ReactNode;
-  className?:string;
-  hover?:boolean;
-  onClick?:()=>void;
-  style?:React.CSSProperties;
+export interface CardProps {
+  children: React.ReactNode
+  className?: string
+  hover?: boolean
+  onClick?: () => void
+  style?: React.CSSProperties
+  id?: string
 }
 
-export function Card({children,className='',hover,onClick,style}:CardProps){
-  return(
-    <motion.div className={className} onClick={onClick}
+export function Card({ children, className = '', hover, onClick, style, id }: CardProps) {
+  return (
+    <div
+      id={id}
+      className={className}
+      onClick={onClick}
       style={{
-        background:'#ffffff',
-        border:'1px solid #e2e8f0',
-        borderRadius:'var(--radius-lg)',
-        padding:24,
-        position:'relative',
-        boxShadow:'0 1px 3px 0 rgba(0, 0, 0, 0.05)',
-        cursor:onClick?'pointer':undefined,
-        ...style
+        background: 'var(--surface-1, #FFFFFF)',
+        border: '1px solid var(--border-subtle, #E7E9EE)',
+        borderRadius: 'var(--radius-lg, 12px)',
+        padding: 24,
+        position: 'relative',
+        boxShadow: 'var(--shadow-xs, 0 1px 2px 0 rgba(16, 24, 40, 0.03))',
+        cursor: onClick ? 'pointer' : undefined,
+        transition: hover ? 'border-color var(--transition), box-shadow var(--transition)' : undefined,
+        ...style,
       }}
-      whileHover={hover?{y:-2,boxShadow:'0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04)'}:undefined}
-      transition={{duration:0.15}}>
+      onMouseEnter={
+        hover
+          ? (e) => {
+              e.currentTarget.style.borderColor = 'var(--border-strong, #D1D5DF)'
+              e.currentTarget.style.boxShadow = 'var(--shadow-sm, 0 1px 3px 0 rgba(16, 24, 40, 0.05))'
+            }
+          : undefined
+      }
+      onMouseLeave={
+        hover
+          ? (e) => {
+              e.currentTarget.style.borderColor = (style?.border as string)?.split(' ')?.[2] || 'var(--border-subtle, #E7E9EE)'
+              e.currentTarget.style.boxShadow = (style?.boxShadow as string) || 'var(--shadow-xs, 0 1px 2px 0 rgba(16, 24, 40, 0.03))'
+            }
+          : undefined
+      }
+    >
       {children}
-    </motion.div>
+    </div>
   )
 }

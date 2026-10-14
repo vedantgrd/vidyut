@@ -11,20 +11,20 @@ export function SplashScreen({ statusMessage }: SplashScreenProps) {
   const [quoteIndex, setQuoteIndex] = useState(() => Math.floor(Math.random() * SPLASH_QUOTES.length))
   const [statusIndex, setStatusIndex] = useState(0)
 
-  // Cycle quote every 4 seconds
+  // Cycle quote periodically
   useEffect(() => {
     const quoteInterval = setInterval(() => {
       setQuoteIndex((prev) => (prev + 1) % SPLASH_QUOTES.length)
-    }, 4000)
+    }, 4500)
 
     return () => clearInterval(quoteInterval)
   }, [])
 
-  // Cycle status message every 2.6 seconds
+  // Cycle status message smoothly
   useEffect(() => {
     const statusInterval = setInterval(() => {
       setStatusIndex((prev) => (prev + 1) % LOADING_STATUS_MESSAGES.length)
-    }, 2600)
+    }, 2400)
 
     return () => clearInterval(statusInterval)
   }, [])
@@ -41,83 +41,68 @@ export function SplashScreen({ statusMessage }: SplashScreenProps) {
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: '#f8fafc',
+        backgroundColor: 'var(--bg-canvas, #FAFAF8)',
         zIndex: 99999,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20,
-        fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
       }}
     >
-      {/* Subtle, soft light background vignette */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '20%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 520,
-          height: 380,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(239, 246, 255, 0.9) 0%, rgba(248, 250, 252, 0) 70%)',
-          pointerEvents: 'none',
-        }}
-      />
-
       <div
         style={{
           position: 'relative',
           zIndex: 10,
           width: '100%',
-          maxWidth: 540,
+          maxWidth: 520,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          textAlign: 'center',
+          textAlign: 'center'
         }}
       >
         {/* Minimalist Vidyut Brand Emblem matching App Navbar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
           <div
             style={{
-              width: 40,
-              height: 40,
-              background: '#1e40af',
+              width: 38,
+              height: 38,
+              background: 'var(--primary, #315EAA)',
               borderRadius: 10,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#ffffff',
-              boxShadow: '0 4px 10px rgba(30, 64, 175, 0.22)',
+              boxShadow: '0 2px 8px rgba(49, 94, 170, 0.2)'
             }}
           >
-            <GraduationCap size={22} />
+            <GraduationCap size={21} />
           </div>
           <div style={{ textAlign: 'left' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span
                 style={{
-                  fontSize: 19,
-                  fontWeight: 800,
-                  color: '#0f172a',
-                  letterSpacing: '-0.02em',
+                  fontSize: 18,
+                  fontWeight: 750,
+                  color: 'var(--text-primary, #172033)',
+                  letterSpacing: '-0.025em'
                 }}
               >
                 Vidyut
               </span>
               <span
                 style={{
-                  fontSize: 10,
+                  fontSize: 9.5,
                   fontWeight: 700,
-                  color: '#059669',
-                  backgroundColor: '#ecfdf5',
-                  border: '1px solid #d1fae5',
-                  padding: '1px 6px',
+                  color: 'var(--success, #247A55)',
+                  backgroundColor: 'var(--success-subtle, #EDF7F2)',
+                  border: '1px solid var(--success-border, #C7E8D8)',
+                  padding: '1px 5px',
                   borderRadius: 4,
                   textTransform: 'uppercase',
-                  letterSpacing: '0.04em',
+                  letterSpacing: '0.04em'
                 }}
               >
                 विद्युत
@@ -125,45 +110,45 @@ export function SplashScreen({ statusMessage }: SplashScreenProps) {
             </div>
             <span
               style={{
-                fontSize: 12,
-                color: '#64748b',
+                fontSize: 11,
+                color: 'var(--text-muted, #8B95A5)',
                 display: 'block',
-                fontWeight: 500,
+                fontWeight: 500
               }}
             >
-              Scholarship Platform
+              Student Success Platform
             </span>
           </div>
         </div>
 
-        {/* Premium Minimalist Quote Card */}
+        {/* Quiet Confidence Quote Card */}
         <div
           style={{
             width: '100%',
-            backgroundColor: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: 16,
-            padding: '24px 28px',
-            boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03)',
-            marginBottom: 24,
-            minHeight: 160,
+            backgroundColor: 'var(--bg-surface, #FFFFFF)',
+            border: '1px solid var(--border-subtle, #E7E9EE)',
+            borderRadius: 14,
+            padding: '24px 26px',
+            boxShadow: '0 8px 24px -4px rgba(23, 32, 51, 0.05), 0 1px 3px rgba(23, 32, 51, 0.03)',
+            marginBottom: 20,
+            minHeight: 154,
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            position: 'relative',
+            position: 'relative'
           }}
         >
           <AnimatePresence mode="wait">
             <motion.div
               key={currentQuote.id}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
+                alignItems: 'center'
               }}
             >
               {/* Category Pill Badge */}
@@ -172,15 +157,15 @@ export function SplashScreen({ statusMessage }: SplashScreenProps) {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 5,
-                  padding: '3px 10px',
+                  padding: '2px 9px',
                   borderRadius: 20,
-                  fontSize: 11,
-                  fontWeight: 700,
+                  fontSize: 10.5,
+                  fontWeight: 650,
                   letterSpacing: '0.02em',
-                  color: currentQuote.categoryBadgeColor,
-                  backgroundColor: currentQuote.categoryBg,
-                  border: `1px solid ${currentQuote.categoryBorder}`,
-                  marginBottom: 12,
+                  color: 'var(--primary, #315EAA)',
+                  backgroundColor: 'var(--accent-subtle, #EEF4FC)',
+                  border: '1px solid var(--accent-border, #C7DCF8)',
+                  marginBottom: 10
                 }}
               >
                 <Sparkles size={11} />
@@ -190,13 +175,13 @@ export function SplashScreen({ statusMessage }: SplashScreenProps) {
               {/* Quote Text */}
               <p
                 style={{
-                  fontSize: 14.5,
+                  fontSize: 14,
                   lineHeight: 1.6,
-                  color: '#1e293b',
+                  color: 'var(--text-primary, #172033)',
                   fontWeight: 500,
                   fontStyle: currentQuote.category === 'sarcastic' ? 'normal' : 'italic',
-                  margin: '0 0 10px',
-                  maxWidth: 480,
+                  margin: '0 0 8px',
+                  maxWidth: 460
                 }}
               >
                 &ldquo;{currentQuote.text}&rdquo;
@@ -205,9 +190,9 @@ export function SplashScreen({ statusMessage }: SplashScreenProps) {
               {/* Author Attribution */}
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 11.5,
                   fontWeight: 600,
-                  color: '#64748b',
+                  color: 'var(--text-secondary, #5E6A7E)'
                 }}
               >
                 — {currentQuote.author}
@@ -221,65 +206,57 @@ export function SplashScreen({ statusMessage }: SplashScreenProps) {
             style={{
               position: 'absolute',
               bottom: 8,
-              right: 12,
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
+              right: 10,
+              background: 'var(--bg-canvas, #FAFAF8)',
+              border: '1px solid var(--border-subtle, #E7E9EE)',
               cursor: 'pointer',
-              color: '#64748b',
-              fontSize: 11,
-              fontWeight: 500,
+              color: 'var(--text-muted, #8B95A5)',
+              fontSize: 10.5,
+              fontWeight: 550,
               display: 'flex',
               alignItems: 'center',
               gap: 4,
               padding: '3px 8px',
               borderRadius: 6,
-              transition: 'all 0.15s ease',
+              transition: 'all 0.15s ease'
             }}
             title="Read next quote"
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#1e40af'
-              e.currentTarget.style.borderColor = '#cbd5e1'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#64748b'
-              e.currentTarget.style.borderColor = '#e2e8f0'
-            }}
           >
             <RefreshCw size={10} />
             <span>Next</span>
           </button>
         </div>
 
-        {/* Minimal Progress Bar matching Vidyut Trust Navy */}
+        {/* Restrained Indeterminate Loader Line (Quiet Confidence) */}
         <div
           style={{
             width: '100%',
-            maxWidth: 240,
-            height: 3,
-            backgroundColor: '#e2e8f0',
+            maxWidth: 200,
+            height: 2.5,
+            backgroundColor: 'var(--border-subtle, #E7E9EE)',
             borderRadius: 3,
             overflow: 'hidden',
             position: 'relative',
-            marginBottom: 12,
+            marginBottom: 10
           }}
         >
           <motion.div
             animate={{
-              x: ['-100%', '200%'],
+              x: ['-100%', '200%']
             }}
             transition={{
-              duration: 1.6,
+              duration: 1.5,
               repeat: Infinity,
-              ease: 'easeInOut',
+              ease: 'easeInOut'
             }}
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
-              width: '50%',
+              width: '45%',
               height: '100%',
-              background: 'linear-gradient(90deg, transparent, #1e40af 40%, #059669 80%, transparent)',
-              borderRadius: 3,
+              background: 'linear-gradient(90deg, transparent, var(--primary, #315EAA) 50%, transparent)',
+              borderRadius: 3
             }}
           />
         </div>
@@ -291,14 +268,14 @@ export function SplashScreen({ statusMessage }: SplashScreenProps) {
             initial={{ opacity: 0, y: 3 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -3 }}
-            transition={{ duration: 0.22 }}
+            transition={{ duration: 0.2 }}
             style={{
               fontSize: 12,
-              color: '#64748b',
+              color: 'var(--text-secondary, #5E6A7E)',
               fontWeight: 500,
               display: 'flex',
               alignItems: 'center',
-              gap: 6,
+              gap: 6
             }}
           >
             <span
@@ -306,8 +283,8 @@ export function SplashScreen({ statusMessage }: SplashScreenProps) {
                 width: 6,
                 height: 6,
                 borderRadius: '50%',
-                backgroundColor: '#059669',
-                display: 'inline-block',
+                backgroundColor: 'var(--success, #247A55)',
+                display: 'inline-block'
               }}
             />
             <span>{currentStatus}</span>
@@ -319,10 +296,10 @@ export function SplashScreen({ statusMessage }: SplashScreenProps) {
       <div
         style={{
           position: 'absolute',
-          bottom: 20,
+          bottom: 18,
           fontSize: 11,
-          color: '#94a3b8',
-          letterSpacing: 0.2,
+          color: 'var(--text-muted, #8B95A5)',
+          letterSpacing: 0.1
         }}
       >
         Vidyut · High-Trust Scholarship Platform
