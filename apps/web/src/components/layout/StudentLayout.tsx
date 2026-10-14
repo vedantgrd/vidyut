@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -82,10 +82,19 @@ export function StudentLayout() {
     navigate('/login')
   }
 
-  const sendAiMessage = async () => {
-    if (!aiMsg.trim() || aiLoading) return
-    const msg = aiMsg.trim()
-    setAiMsg('')
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (aiOpen) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [aiMessages, aiLoading, aiOpen])
+
+  const sendAiMessage = async (overrideMsg?: string) => {
+    const raw = overrideMsg ?? aiMsg
+    if (!raw.trim() || aiLoading) return
+    const msg = raw.trim()
+    if (!overrideMsg) setAiMsg('')
     setAiMessages((p) => [...p, { role: 'user', text: msg }])
     setAiLoading(true)
     try {
@@ -676,34 +685,74 @@ export function StudentLayout() {
               }}
             >
               {aiMessages.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '36px 12px', color: 'var(--text-secondary, #657084)' }}>
+                <div style={{ textAlign: 'center', padding: '16px 8px', color: 'var(--text-secondary, #657084)' }}>
                   <div
                     style={{
-                      width: 36,
-                      height: 36,
+                      width: 32,
+                      height: 32,
                       borderRadius: '50%',
                       background: 'var(--brand-subtle, #EDF3FC)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      margin: '0 auto 10px',
+                      margin: '0 auto 8px',
                     }}
                   >
-                    <Sparkles size={16} color="var(--brand-primary, #315EAA)" />
+                    <Sparkles size={15} color="var(--brand-primary, #315EAA)" />
                   </div>
                   <p
                     style={{
                       fontWeight: 600,
                       color: 'var(--text-primary, #172033)',
-                      fontSize: 13,
-                      marginBottom: 4,
+                      fontSize: 12.5,
+                      marginBottom: 3,
                     }}
                   >
-                    Ask anything about your scholarships
+                    Vidyut Intelligence Assistant
                   </p>
-                  <p style={{ fontSize: 11.5, color: 'var(--text-secondary, #657084)', lineHeight: 1.5, margin: 0 }}>
-                    "What scholarships match my academic profile?", "Are my vault documents complete?", or "Explain my eligibility."
+                  <p style={{ fontSize: 11, color: 'var(--text-secondary, #657084)', lineHeight: 1.4, margin: '0 0 12px' }}>
+                    Connected to your profile, vault, and DBT treasury. Click a topic to ask:
                   </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, textAlign: 'left' }}>
+                    {[
+                      'Explain my eligibility.',
+                      'What can you do?',
+                      'Are my vault documents complete?',
+                      'Show my installment payouts',
+                      'What deadlines are coming up?'
+                    ].map((prompt) => (
+                      <button
+                        key={prompt}
+                        onClick={() => sendAiMessage(prompt)}
+                        style={{
+                          background: 'var(--surface-2, #F7F8F9)',
+                          border: '1px solid var(--border-subtle, #E7E9EE)',
+                          borderRadius: 'var(--radius-sm, 6px)',
+                          padding: '7px 10px',
+                          fontSize: '11.5px',
+                          color: 'var(--brand-primary, #315EAA)',
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          transition: 'all 0.15s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--brand-subtle, #EDF3FC)'
+                          e.currentTarget.style.borderColor = 'var(--brand-primary, #315EAA)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--surface-2, #F7F8F9)'
+                          e.currentTarget.style.borderColor = 'var(--border-subtle, #E7E9EE)'
+                        }}
+                      >
+                        <Sparkles size={11} style={{ flexShrink: 0 }} />
+                        <span>{prompt}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
               {aiMessages.map((m, i) => (
@@ -730,6 +779,7 @@ export function StudentLayout() {
                   Consulting verified records...
                 </div>
               )}
+              <div ref={messagesEndRef} />
             </div>
 
             {/* AI Input */}
@@ -765,7 +815,7 @@ export function StudentLayout() {
                 }}
               />
               <button
-                onClick={sendAiMessage}
+                onClick={() => sendAiMessage()}
                 disabled={!aiMsg.trim() || aiLoading}
                 style={{
                   width: 34,
