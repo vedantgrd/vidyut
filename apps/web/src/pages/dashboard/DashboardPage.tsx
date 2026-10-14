@@ -6,7 +6,6 @@ import {
   Bell,
   ArrowRight,
   TrendingUp,
-  Calendar,
   Shield,
   Banknote,
   CheckCircle2,
@@ -22,6 +21,8 @@ import { Button } from '@/components/ui/Button'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { Badge } from '@/components/ui/Badge'
+import { RescueModeWidget } from '@/components/dashboard/RescueModeWidget'
+import { DashboardCalendarWidget } from '@/components/dashboard/DashboardCalendarWidget'
 
 const ICONS: Record<string, React.FC<{ size?: number; color?: string }>> = {
   Award,
@@ -161,53 +162,122 @@ export function DashboardPage() {
         </Card>
       )}
 
-      {/* Workspace Grid: Profile Readiness & Deadlines */}
+      {/* Deadline Rescue Mode - Personalized Action Plan */}
+      <RescueModeWidget />
+
+      {/* Workspace Grid: Profile Readiness & Smart Deadlines Agenda */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 18 }}>
         {/* Profile Completeness & Vault Overview */}
-        <Card style={{ padding: 20, border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <TrendingUp size={16} color="#1e40af" />
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0f172a' }}>Profile & Vault Readiness</h3>
+        <Card style={{ padding: 20, border: '1px solid #e2e8f0', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <TrendingUp size={16} color="#1e40af" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', margin: 0 }}>Profile & Vault Readiness</h3>
+                  <p style={{ fontSize: 11, color: '#64748b', margin: 0 }}>Key certificates for pre-submission checks</p>
+                </div>
+              </div>
+              <Badge variant={data.profileScore >= 80 ? 'success' : data.profileScore >= 50 ? 'warning' : 'error'}>
+                {data.profileScore}% Complete
+              </Badge>
             </div>
-            <Badge variant={data.profileScore >= 80 ? 'success' : data.profileScore >= 50 ? 'warning' : 'error'}>
-              {data.profileScore}% Complete
-            </Badge>
-          </div>
-          <ProgressBar value={data.profileScore} height={8} color={data.profileScore >= 80 ? '#059669' : data.profileScore >= 50 ? '#d97706' : '#dc2626'} />
+            
+            <ProgressBar value={data.profileScore} height={8} color={data.profileScore >= 80 ? '#059669' : data.profileScore >= 50 ? '#d97706' : '#dc2626'} />
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, paddingTop: 12, borderTop: '1px solid #f1f5f9', fontSize: 12, color: '#64748b' }}>
-            <span>Vault: <strong>{data.vault?.verified || 0} Verified</strong> · {data.vault?.pending || 0} Pending</span>
-            <Link to="/documents" style={{ color: '#1e40af', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              Open Vault <ArrowRight size={12} />
-            </Link>
-          </div>
-        </Card>
+            {/* Core Document Statuses */}
+            <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {(data.vault?.keyDocuments && data.vault.keyDocuments.length > 0 ? data.vault.keyDocuments : [
+                { key: 'aadhaar', label: 'Aadhaar Card', type: 'AADHAAR', status: 'PENDING' },
+                { key: 'income', label: 'Income Certificate', type: 'INCOME_CERTIFICATE', status: 'PENDING' },
+                { key: 'marksheet', label: 'Academic Marksheet', type: 'MARKSHEET', status: 'PENDING' },
+                { key: 'photo', label: 'Passport Photo', type: 'PHOTOGRAPH', status: 'PENDING' }
+              ]).map((doc) => {
+                const isVerified = doc.status === 'VERIFIED'
+                const isPending = doc.status === 'PENDING'
 
-        {/* Upcoming Deadlines */}
-        <Card style={{ padding: 20, border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-            <Calendar size={16} color="#1e40af" />
-            <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0f172a' }}>Upcoming Deadlines</h3>
-          </div>
-          {data.upcomingDeadlines.length === 0 ? (
-            <p style={{ color: '#64748b', fontSize: 13, margin: 0 }}>No urgent deadlines for your active applications.</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {data.upcomingDeadlines.map((d) => {
-                const days = daysUntil(d.deadline)
                 return (
-                  <Link to={`/applications/${d.id}`} key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 12px', background: '#f8fafc', borderRadius: 8, border: '1px solid #e2e8f0', textDecoration: 'none' }}>
-                    <p style={{ fontSize: 13, color: '#0f172a', fontWeight: 600, margin: 0 }}>{d.scholarshipName}</p>
-                    <Badge variant={days <= 7 ? 'error' : days <= 30 ? 'warning' : 'default'} dot>
-                      {days > 0 ? `${days}d left` : 'Due'}
-                    </Badge>
-                  </Link>
+                  <div
+                    key={doc.key}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '8px 12px',
+                      borderRadius: 8,
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      {isVerified ? (
+                        <CheckCircle2 size={15} color="#059669" />
+                      ) : isPending ? (
+                        <Clock size={15} color="#d97706" />
+                      ) : (
+                        <FileText size={15} color="#64748b" />
+                      )}
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>
+                        {doc.label}
+                      </span>
+                    </div>
+
+                    <div>
+                      {isVerified ? (
+                        <Badge variant="success" dot>Verified</Badge>
+                      ) : isPending ? (
+                        <Badge variant="warning" dot>Pending Review</Badge>
+                      ) : (
+                        <Link to="/documents" style={{ textDecoration: 'none' }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: '#1e40af' }}>+ Upload</span>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
                 )
               })}
             </div>
-          )}
+
+            {/* Auto-Attach Callout Banner */}
+            <div style={{
+              marginTop: 12,
+              padding: '9px 12px',
+              borderRadius: 8,
+              background: '#eff6ff',
+              border: '1px solid #bfdbfe',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              fontSize: 11,
+              color: '#1e3a8a'
+            }}>
+              <Sparkles size={14} color="#1e40af" style={{ flexShrink: 0 }} />
+              <span>
+                <strong>Smart Vault:</strong> Documents are automatically linked across all matched schemes.
+              </span>
+            </div>
+          </div>
+
+          {/* Footer stats and links */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, paddingTop: 12, borderTop: '1px solid #f1f5f9', fontSize: 12 }}>
+            <span style={{ color: '#64748b', fontSize: 11 }}>
+              Vault: <strong>{data.vault?.verified || 0} Verified</strong> · {data.vault?.pending || 0} Pending
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <Link to="/profile" style={{ color: '#64748b', fontSize: 11, textDecoration: 'none', fontWeight: 600 }}>
+                Edit Profile
+              </Link>
+              <Link to="/documents" style={{ color: '#1e40af', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12 }}>
+                Open Vault <ArrowRight size={12} />
+              </Link>
+            </div>
+          </div>
         </Card>
+
+        {/* Upcoming Deadlines & Calendar Agenda */}
+        <DashboardCalendarWidget />
       </div>
 
       {/* Eligible Scholarships Match Grid */}

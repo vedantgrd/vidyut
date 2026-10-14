@@ -17,6 +17,7 @@ import{AcademicPage}from'@/pages/onboarding/AcademicPage'
 import{FamilyInfoPage}from'@/pages/onboarding/FamilyInfoPage'
 import{DocumentsPage as OnboardingDocumentsPage}from'@/pages/onboarding/DocumentsPage'
 import{DashboardPage}from'@/pages/dashboard/DashboardPage'
+import{CalendarPage}from'@/pages/dashboard/CalendarPage'
 import{ScholarshipsPage}from'@/pages/dashboard/ScholarshipsPage'
 import{ScholarshipDetailPage}from'@/pages/dashboard/ScholarshipDetailPage'
 import{ApplicationsPage}from'@/pages/dashboard/ApplicationsPage'
@@ -84,6 +85,7 @@ function AppBootstrap(){
     </Route>
     <Route element={<RequireOnboarding><StudentLayout/></RequireOnboarding>}>
       <Route path="/dashboard" element={<DashboardPage/>}/>
+      <Route path="/calendar" element={<CalendarPage/>}/>
       <Route path="/scholarships" element={<ScholarshipsPage/>}/>
       <Route path="/scholarships/:id" element={<ScholarshipDetailPage/>}/>
       <Route path="/applications" element={<ApplicationsPage/>}/>

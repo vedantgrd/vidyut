@@ -36,8 +36,19 @@ export function ApplicationsPage(){
                 <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:14}}>
                   <div style={{flex:1}}>
                     <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:4}}><h3 style={{fontSize:14,fontWeight:600}}>{app.scholarship.name}</h3><StatusBadge status={app.status}/></div>
-                    <p style={{fontSize:12,color:'var(--text-tertiary)',marginBottom:app.status==='DRAFT'?10:0}}>{app.scholarship.provider}</p>
-                    {app.status==='DRAFT'&&<ProgressBar value={app.completionPercent} showLabel/>}
+                    {app.status==='DRAFT'&&(
+                      <div style={{ marginTop: 8 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: app.completionPercent >= 100 ? '#059669' : '#1e40af' }}>
+                            {app.completionPercent >= 100 ? '✓ Ready for Preflight & Submit' : 'Application Readiness'}
+                          </span>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: app.completionPercent >= 100 ? '#059669' : '#475569' }}>
+                            {app.completionPercent}%
+                          </span>
+                        </div>
+                        <ProgressBar value={app.completionPercent} height={6} color={app.completionPercent >= 100 ? '#059669' : '#1e40af'} />
+                      </div>
+                    )}
                   </div>
                   <div style={{textAlign:'right',flexShrink:0}}>
                     <p style={{fontSize:14,fontWeight:700,color:'var(--success)'}}>{fmtAmt(app.scholarship.amount)}</p>

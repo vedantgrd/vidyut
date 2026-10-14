@@ -14,6 +14,9 @@ import notificationRoutes from'./routes/notifications.js'
 import settingsRoutes from'./routes/settings.js'
 import aiRoutes from'./routes/ai.js'
 import adminRoutes from'./routes/admin.js'
+import calendarRoutes from'./routes/calendar.js'
+import taskRoutes from'./routes/tasks.js'
+import rescueRoutes from'./routes/rescue.js'
 import { ensureStorageSeedPopulated } from './services/storageService.js'
 
 for(const k of['DATABASE_URL','JWT_ACCESS_SECRET','JWT_REFRESH_SECRET']){if(!process.env[k]){console.error(`Missing env: ${k}`);process.exit(1)}}
@@ -52,6 +55,7 @@ api.route('/auth',authRoutes);api.route('/onboarding',onboardingRoutes);api.rout
 api.route('/documents',documentRoutes);api.route('/scholarships',scholarshipRoutes);api.route('/applications',applicationRoutes)
 api.route('/dashboard',dashboardRoutes);api.route('/notifications',notificationRoutes);api.route('/settings',settingsRoutes)
 api.route('/ai',aiRoutes);api.route('/admin',adminRoutes)
+api.route('/calendar',calendarRoutes);api.route('/tasks',taskRoutes);api.route('/rescue',rescueRoutes)
 app.route('/api/v1',api)
 app.notFound(c=>c.json({error:`Not found: ${c.req.method} ${c.req.path}`},404))
 app.onError((err,c)=>{console.error('[Error]',err);return c.json({error:'Internal server error',message:process.env.NODE_ENV==='development'?err.message:undefined},500)})

@@ -13,6 +13,7 @@ import{StatusBadge}from'@/components/ui/StatusBadge'
 import{ProgressBar}from'@/components/ui/ProgressBar'
 import{toast}from'@/components/ui/Toast'
 import{DocumentViewerModal}from'@/components/ui/DocumentViewerModal'
+import{ReadinessCard}from'@/components/readiness/ReadinessCard'
 
 function fmtDate(d:string){
   return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
@@ -280,6 +281,13 @@ export function ApplicationDetailPage(){
       </Card>
     )}
 
+
+    {/* Application Readiness Card */}
+    {data?.readiness && isDraft && (
+      <div style={{ marginBottom: 20 }}>
+        <ReadinessCard readiness={data.readiness} />
+      </div>
+    )}
 
     {/* Draft Stepper Tabs */}
     {isDraft?(

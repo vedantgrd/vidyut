@@ -77,10 +77,41 @@ dashboard.get('/home',async(c)=>{
       totalApprovedAmount,
       approvedCount:approved.length
     },
-    vault:{
-      total:docs.length,
-      verified:vaultVerified,
-      pending:vaultPending
+    vault: {
+      total: docs.length,
+      verified: vaultVerified,
+      pending: vaultPending,
+      rejected: docs.filter((d: any) => d.status === 'REJECTED').length,
+      keyDocuments: [
+        {
+          key: 'aadhaar',
+          label: 'Aadhaar Card',
+          type: 'AADHAAR',
+          status: docs.find((d: any) => d.type === 'AADHAAR')?.status || 'MISSING',
+          docId: docs.find((d: any) => d.type === 'AADHAAR')?.id || null
+        },
+        {
+          key: 'income',
+          label: 'Income Certificate',
+          type: 'INCOME_CERTIFICATE',
+          status: docs.find((d: any) => d.type === 'INCOME_CERTIFICATE')?.status || 'MISSING',
+          docId: docs.find((d: any) => d.type === 'INCOME_CERTIFICATE')?.id || null
+        },
+        {
+          key: 'marksheet',
+          label: 'Academic Marksheet',
+          type: 'MARKSHEET',
+          status: docs.find((d: any) => ['TENTH_MARKSHEET', 'TWELFTH_MARKSHEET', 'DEGREE_CERTIFICATE', 'TRANSCRIPT'].includes(d.type))?.status || 'MISSING',
+          docId: docs.find((d: any) => ['TENTH_MARKSHEET', 'TWELFTH_MARKSHEET', 'DEGREE_CERTIFICATE', 'TRANSCRIPT'].includes(d.type))?.id || null
+        },
+        {
+          key: 'photo',
+          label: 'Passport Photo',
+          type: 'PHOTOGRAPH',
+          status: docs.find((d: any) => d.type === 'PHOTOGRAPH')?.status || 'MISSING',
+          docId: docs.find((d: any) => d.type === 'PHOTOGRAPH')?.id || null
+        }
+      ]
     },
     unreadNotifications:uc,
     eligibleScholarships:eligible,

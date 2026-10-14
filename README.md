@@ -68,8 +68,11 @@ Every year, millions of Indian students miss life-changing scholarships. Not bec
 | | Feature | What it does |
 |:-:|---|---|
 | 🚀 | **Command Center** | A unified workspace with profile match scores, active application pipelines, vault health, and live fund disbursements. |
+| 🛡️ | **Deadline Rescue Mode** | Personalized, prioritized action agenda ranking approaching deadlines, missing documents, and tasks with explainable urgency multipliers and 1-click corrective actions. |
+| 📅 | **Smart Scholarship Calendar** | Personal interactive calendar with monthly grid, agenda timeline, date-only deadline safety without timezone drift, personal task tracking, requirement-synced suggested tasks, and 1-click RFC-5545 `.ics` export. |
+| 📊 | **Scholarship Readiness Engine** | Transparent application-completeness scoring (85% mandatory requirements + 15% optional polish), preflight checklist validation, and authoritative server-side submit enforcement. |
+| 🔐 | **Intelligent Document Vault** | Secure, reusable student documents with vault health analytics, zero-cost rule-based metadata auto-detection (issue date, expiry, certificate number), and cross-application usage safety before deletion. |
 | 🎯 | **Eligibility Matcher** | Evaluates family income, caste category, domicile state, gender, disability, minority status, and academic cutoffs (percentage/CGPA) into a real **0–100%** score. |
-| 🔐 | **Encrypted Document Vault** | Upload once with instant in-browser preview, graceful replacement-conflict handling, and automatic linking to eligible applications. |
 | 🧭 | **4-Step Application Wizard** | Prefilled dossier → 1-click vault linking → honesty declaration → instant tracking ID. |
 | 🤖 | **Context-Aware AI Assistant** | Reads your real profile, family income, and uploaded credentials to explain match requirements without hallucinating. |
 | 💸 | **DBT Tracking** | Real-time audit trail of scholarship tranches, bank reference codes, and installment dates. |
@@ -340,7 +343,7 @@ Pre-seeded accounts are available via the **Quick Demo Access** card on the logi
 # TypeScript compilation checks across all packages
 npm run typecheck
 
-# Full automated end-to-end journey test suite (60 assertions across auth, onboarding, vault, eligibility, submit, admin review, and DBT payouts)
+# Full automated end-to-end journey test suite (90 assertions across auth, onboarding, vault metadata, eligibility, submit, admin review, DBT payouts, smart calendar, readiness preflight, and rescue mode)
 npm run test:e2e
 
 # Production build validation across workspaces

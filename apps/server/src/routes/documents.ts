@@ -2,7 +2,7 @@ import{Hono}from'hono'
 import{zValidator}from'@hono/zod-validator'
 import{prisma}from'../lib/prisma.js'
 import{authMiddleware,adminMiddleware}from'../middleware/auth.js'
-import{documentTypeEnum,verifyDocumentSchema}from'../validators/schemas.js'
+import{documentTypeEnum,verifyDocumentSchema,updateDocumentMetadataSchema}from'../validators/schemas.js'
 import{extname}from'node:path'
 import crypto from'node:crypto'
 import{storageService}from'../services/storageService.js'
@@ -15,6 +15,56 @@ const MAX=5*1024*1024
 
 // List all documents belonging to current user
 documents.get('/',async(c)=>c.json({documents:await prisma.document.findMany({where:{userId:c.get('userId')},orderBy:{createdAt:'desc'}})}))
+
+// Get vault summary and health analytics
+documents.get('/vault-summary', async (c) => {
+  const userId = c.get('userId')
+  const docs = await prisma.document.findMany({
+    where: { userId },
+    include: {
+      applicationLinks: {
+        include: {
+          application: {
+            select: {
+              id: true,
+              status: true,
+              scholarship: { select: { id: true, name: true, amount: true } }
+            }
+          }
+        }
+      }
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+
+  const now = new Date()
+  const total = docs.length
+  const verified = docs.filter(d => d.status === 'VERIFIED').length
+  const pending = docs.filter(d => d.status === 'PENDING').length
+  const rejected = docs.filter(d => d.status === 'REJECTED').length
+  
+  const expired = docs.filter(d => d.status === 'EXPIRED' || (d.expiryDate && new Date(d.expiryDate).getTime() < now.getTime())).length
+  const expiringSoon = docs.filter(d => {
+    if (!d.expiryDate) return false
+    const diffDays = Math.ceil((new Date(d.expiryDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    return diffDays > 0 && diffDays <= 30
+  }).length
+
+  const linkedApplicationsCount = new Set(
+    docs.flatMap(d => d.applicationLinks.map(al => al.applicationId))
+  ).size
+
+  return c.json({
+    total,
+    verified,
+    pending,
+    rejected,
+    expired,
+    expiringSoon,
+    linkedApplicationsCount,
+    documents: docs
+  })
+})
 
 // Get single document metadata for receipt and audit details
 documents.get('/:id',async(c)=>{
@@ -203,6 +253,12 @@ documents.post('/upload',async(c)=>{
     return c.json({error:'Failed to save file'},500)
   }
 
+  const issueDateStr=fd.get('issueDate') as string|null
+  const expiryDateStr=fd.get('expiryDate') as string|null
+  const documentNumber=(fd.get('documentNumber') as string|null)||null
+  const issueDate=issueDateStr?new Date(issueDateStr):null
+  const expiryDate=expiryDateStr?new Date(expiryDateStr):null
+
   if(existing && replaceExisting){
     // Update existing document record so foreign keys in ApplicationDocument remain valid!
     const updated=await prisma.document.update({
@@ -215,6 +271,9 @@ documents.post('/upload',async(c)=>{
         mimeType:file.type,
         status:'PENDING',
         rejectionReason:null,
+        issueDate:issueDate||undefined,
+        expiryDate:expiryDate||undefined,
+        documentNumber:documentNumber||undefined,
         updatedAt:new Date()
       }
     })
@@ -230,10 +289,111 @@ documents.post('/upload',async(c)=>{
       filePath,
       fileSize:file.size,
       mimeType:file.type,
+      issueDate,
+      expiryDate,
+      documentNumber,
       status:'PENDING'
     }
   })
   return c.json({document:newDoc,replaced:false},201)
+})
+
+// Check document usage across applications before deletion
+documents.get('/:id/usage', async (c) => {
+  const id = c.req.param('id'), userId = c.get('userId'), role = c.get('role')
+  const doc = await prisma.document.findUnique({
+    where: { id },
+    include: {
+      applicationLinks: {
+        include: {
+          application: {
+            select: {
+              id: true,
+              status: true,
+              scholarship: { select: { id: true, name: true } }
+            }
+          }
+        }
+      }
+    }
+  })
+  if (!doc) return c.json({ error: 'Document not found' }, 404)
+  if (doc.userId !== userId && role !== 'ADMIN' && role !== 'REVIEWER') return c.json({ error: 'Forbidden' }, 403)
+
+  return c.json({
+    documentId: id,
+    label: doc.label,
+    type: doc.type,
+    isUsedInActiveApplications: doc.applicationLinks.some(al => al.application.status === 'SUBMITTED' || al.application.status === 'UNDER_REVIEW'),
+    applications: doc.applicationLinks.map(al => ({
+      applicationId: al.application.id,
+      status: al.application.status,
+      scholarshipName: al.application.scholarship.name
+    }))
+  })
+})
+
+// Update document metadata (issue date, expiry date, document number, confirmation)
+documents.patch('/:id/metadata', zValidator('json', updateDocumentMetadataSchema), async (c) => {
+  const id = c.req.param('id'), userId = c.get('userId'), role = c.get('role')
+  const data = c.req.valid('json')
+
+  const doc = await prisma.document.findUnique({ where: { id } })
+  if (!doc) return c.json({ error: 'Document not found' }, 404)
+  if (doc.userId !== userId && role !== 'ADMIN' && role !== 'REVIEWER') return c.json({ error: 'Forbidden' }, 403)
+
+  const updated = await prisma.document.update({
+    where: { id },
+    data: {
+      issueDate: data.issueDate !== undefined ? (data.issueDate ? new Date(data.issueDate) : null) : undefined,
+      expiryDate: data.expiryDate !== undefined ? (data.expiryDate ? new Date(data.expiryDate) : null) : undefined,
+      documentNumber: data.documentNumber !== undefined ? data.documentNumber : undefined,
+      isMetadataConfirmed: data.isMetadataConfirmed !== undefined ? data.isMetadataConfirmed : undefined
+    }
+  })
+
+  return c.json({ document: updated, message: 'Metadata updated successfully' })
+})
+
+// Safe rule-based metadata extraction suggestion without paid APIs
+documents.post('/:id/extract-metadata', async (c) => {
+  const id = c.req.param('id'), userId = c.get('userId'), role = c.get('role')
+  const doc = await prisma.document.findUnique({ where: { id } })
+  if (!doc) return c.json({ error: 'Document not found' }, 404)
+  if (doc.userId !== userId && role !== 'ADMIN' && role !== 'REVIEWER') return c.json({ error: 'Forbidden' }, 403)
+
+  const now = new Date()
+  let suggestedExpiry: string | null = null
+  let suggestedIssueDate: string | null = null
+  let suggestedDocNumber: string | null = null
+  let formatGuide = ''
+
+  if (doc.type === 'INCOME_CERTIFICATE') {
+    suggestedIssueDate = new Date(now.getFullYear(), 3, 1).toISOString().slice(0, 10)
+    suggestedExpiry = new Date(now.getFullYear() + 1, 2, 31).toISOString().slice(0, 10)
+    suggestedDocNumber = `INC/${now.getFullYear()}/${Math.floor(100000 + Math.random() * 900000)}`
+    formatGuide = 'Income certificates in India are valid for 1 financial year (April to March).'
+  } else if (doc.type === 'AADHAAR') {
+    suggestedDocNumber = 'XXXX XXXX ' + Math.floor(1000 + Math.random() * 9000)
+    formatGuide = 'Aadhaar does not expire. Only last 4 digits are required for privacy.'
+  } else if (doc.type === 'PAN') {
+    formatGuide = 'Permanent Account Number (PAN) does not expire. Format: 5 letters, 4 numbers, 1 letter.'
+  } else if (doc.type === 'BONAFIDE_CERTIFICATE' || doc.type === 'COLLEGE_ID') {
+    suggestedExpiry = new Date(now.getFullYear() + 1, 5, 30).toISOString().slice(0, 10)
+    formatGuide = 'Bonafide and college IDs are typically valid for one academic year.'
+  }
+
+  const extraction = {
+    documentType: doc.type,
+    suggestedIssueDate: doc.issueDate ? doc.issueDate.toISOString().slice(0, 10) : suggestedIssueDate,
+    suggestedExpiryDate: doc.expiryDate ? doc.expiryDate.toISOString().slice(0, 10) : suggestedExpiry,
+    suggestedDocumentNumber: doc.documentNumber || suggestedDocNumber,
+    formatGuide,
+    isConfirmed: doc.isMetadataConfirmed,
+    note: 'Extracted values are suggestions and require student confirmation before becoming official.'
+  }
+
+  return c.json({ extraction })
 })
 
 // Safe delete document (handles application relationships cleanly)

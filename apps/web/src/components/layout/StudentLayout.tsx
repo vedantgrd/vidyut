@@ -1,13 +1,14 @@
 import{useState}from'react'
 import{Outlet,NavLink,useNavigate}from'react-router-dom'
 import{motion,AnimatePresence}from'framer-motion'
-import{GraduationCap,LayoutDashboard,Search,FileText,FolderOpen,User,Bell,Settings,LogOut,ChevronLeft,ChevronRight,Sparkles,X,Send}from'lucide-react'
+import{GraduationCap,LayoutDashboard,CalendarDays,Search,FileText,FolderOpen,User,Bell,Settings,LogOut,ChevronLeft,ChevronRight,Sparkles,X,Send}from'lucide-react'
 import{useAuthStore}from'@/store/authStore'
 import{useNotificationStore}from'@/store/notificationStore'
 import{api}from'@/api/client'
 
 const NAV=[
   {to:'/dashboard',icon:LayoutDashboard,label:'Dashboard'},
+  {to:'/calendar',icon:CalendarDays,label:'Calendar'},
   {to:'/scholarships',icon:Search,label:'Scholarships'},
   {to:'/applications',icon:FileText,label:'Applications'},
   {to:'/documents',icon:FolderOpen,label:'Documents'},

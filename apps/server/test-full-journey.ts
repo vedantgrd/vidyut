@@ -536,6 +536,168 @@ async function run() {
     assert(finalAppData.application?.disbursements?.length === 2, 'All 2 installment tranches visible in audit trail')
     assert(finalAppData.application?.statusHistory?.length >= 4, 'Complete chronological status audit trail preserved')
 
+    // ========================================================
+    // 8. TESTING SMART SCHOLARSHIP CALENDAR & STUDENT TASKS
+    // ========================================================
+    console.log('\n--- 8. Testing Smart Scholarship Calendar & Student Tasks ---')
+
+    // 8.1 Fetch Calendar Events
+    const calRes = await fetch(`${API_BASE}/calendar/events`, {
+      headers: { Authorization: `Bearer ${studentToken}` }
+    })
+    const calData = await calRes.json()
+    assert(calRes.status === 200, 'Calendar events retrieved HTTP 200')
+    assert(Array.isArray(calData.events), 'Events returned as an array')
+    assert(calData.events.length > 0, `Events retrieved: ${calData.events.length}`)
+    // Verify date-only format without timezone drift
+    const allDatesValid = calData.events.every((e: any) => /^\d{4}-\d{2}-\d{2}$/.test(e.date))
+    assert(allDatesValid, 'All calendar event dates formatted as date-only YYYY-MM-DD')
+
+    // 8.2 iCalendar Export (.ics)
+    const icsRes = await fetch(`${API_BASE}/calendar/export.ics`, {
+      headers: { Authorization: `Bearer ${studentToken}` }
+    })
+    assert(icsRes.status === 200, 'Calendar .ics export generated HTTP 200')
+    const icsText = await icsRes.text()
+    assert(icsText.includes('BEGIN:VCALENDAR') && icsText.includes('END:VCALENDAR'), 'RFC-5545 standard VCALENDAR structure verified')
+
+    // 8.3 Create Student Task
+    const createTaskRes = await fetch(`${API_BASE}/tasks`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${studentToken}`
+      },
+      body: JSON.stringify({
+        title: 'Verify College Fee Receipt',
+        description: 'Ensure college stamp and registrar seal are visible',
+        dueDate: '2026-11-15',
+        priority: 'HIGH',
+        scholarshipId: testScholarshipId
+      })
+    })
+    const taskData = await createTaskRes.json()
+    assert(createTaskRes.status === 201, 'Student task created HTTP 201')
+    const createdTaskId = taskData.task.id
+    assert(taskData.task.isCompleted === false, 'Initial task isCompleted is false')
+
+    // 8.4 Toggle Task Completion
+    const toggleTaskRes = await fetch(`${API_BASE}/tasks/${createdTaskId}/toggle`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${studentToken}` }
+    })
+    const toggleData = await toggleTaskRes.json()
+    assert(toggleTaskRes.status === 200 && toggleData.task.isCompleted === true, 'Task toggled to isCompleted === true')
+
+    // 8.5 Boundary Isolation on Tasks: Intruder cannot modify task
+    const intruderToggle = await fetch(`${API_BASE}/tasks/${createdTaskId}/toggle`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${secondStudentToken}` }
+    })
+    assert(intruderToggle.status === 403, 'Intruder blocked from toggling another student task HTTP 403 Forbidden')
+
+    // 8.6 Sync Suggested Tasks from Application Requirements
+    const suggestedTasksRes = await fetch(`${API_BASE}/tasks/sync-suggested`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${studentToken}` }
+    })
+    const suggestedData = await suggestedTasksRes.json()
+    assert(suggestedTasksRes.status === 200, 'Suggested requirement tasks synced HTTP 200')
+    assert(typeof suggestedData.generatedCount === 'number', `Suggested sync returns generatedCount (${suggestedData.generatedCount} tasks)`)
+
+    // 8.7 Delete Personal Task
+    const deleteTaskRes = await fetch(`${API_BASE}/tasks/${createdTaskId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${studentToken}` }
+    })
+    assert(deleteTaskRes.status === 200, 'Student task deleted HTTP 200')
+
+    // ========================================================
+    // 9. TESTING INTELLIGENT DOCUMENT VAULT & METADATA
+    // ========================================================
+    console.log('\n--- 9. Testing Intelligent Document Vault & Metadata ---')
+
+    // 9.1 Vault Health Summary
+    const vaultSummaryRes = await fetch(`${API_BASE}/documents/vault-summary`, {
+      headers: { Authorization: `Bearer ${studentToken}` }
+    })
+    const vaultSummary = await vaultSummaryRes.json()
+    assert(vaultSummaryRes.status === 200, 'Vault health summary retrieved HTTP 200')
+    assert(typeof vaultSummary.total === 'number', `Summary contains total documents (${vaultSummary.total} uploaded)`)
+    assert(typeof vaultSummary.verified === 'number', `Summary contains verified documents count (${vaultSummary.verified} verified)`)
+
+    // 9.2 Safe Rule-Based Metadata Extraction Assist
+    const extractRes = await fetch(`${API_BASE}/documents/${uploadedDocId}/extract-metadata`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${studentToken}` }
+    })
+    const extractData = await extractRes.json()
+    assert(extractRes.status === 200, 'Rule-based metadata suggestion generated HTTP 200')
+    assert(Boolean(extractData.extraction?.formatGuide), 'Extraction response includes scheme format guideline without paid OCR')
+
+    // 9.3 Update Document Metadata (Issue Date, Expiry, Certificate Number)
+    const updateMetaRes = await fetch(`${API_BASE}/documents/${uploadedDocId}/metadata`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${studentToken}`
+      },
+      body: JSON.stringify({
+        issueDate: '2025-06-01',
+        expiryDate: '2028-06-01',
+        documentNumber: 'UIDAI-XXXX-1234',
+        isMetadataConfirmed: true
+      })
+    })
+    const metaData = await updateMetaRes.json()
+    assert(updateMetaRes.status === 200, 'Document metadata persisted HTTP 200')
+    assert(metaData.document?.documentNumber === 'UIDAI-XXXX-1234', 'Document certificate number saved')
+    assert(metaData.document?.isMetadataConfirmed === true, 'Metadata confirmed flag set')
+
+    // 9.4 Document Cross-Application Usage Tracking
+    const usageRes = await fetch(`${API_BASE}/documents/${uploadedDocId}/usage`, {
+      headers: { Authorization: `Bearer ${studentToken}` }
+    })
+    const usageData = await usageRes.json()
+    assert(usageRes.status === 200, 'Document application usage retrieved HTTP 200')
+    assert(Array.isArray(usageData.applications), 'Application usage returned as array')
+
+    // ========================================================
+    // 10. TESTING READINESS ENGINE & PREFLIGHT VALIDATION
+    // ========================================================
+    console.log('\n--- 10. Testing Scholarship Readiness Engine & Preflight ---')
+
+    // 10.1 Preflight on Submitted Application
+    const preflightRes = await fetch(`${API_BASE}/applications/${testAppId}/preflight`, {
+      headers: { Authorization: `Bearer ${studentToken}` }
+    })
+    const preflightData = await preflightRes.json()
+    assert(preflightRes.status === 200, 'Application preflight check returned HTTP 200')
+    assert(typeof preflightData.preflight?.readinessPercentage === 'number', 'Deterministic readiness percentage computed', `${preflightData.preflight.readinessPercentage}%`)
+    assert(Array.isArray(preflightData.preflight?.completedRequirements), 'Completed requirements list provided')
+    assert(preflightData.preflight?.completedRequirements.length > 0, 'Mandatory documents and profile items marked satisfied')
+
+    // ========================================================
+    // 11. TESTING DEADLINE RESCUE MODE
+    // ========================================================
+    console.log('\n--- 11. Testing Deadline Rescue Mode ---')
+
+    // 11.1 Fetch Prioritized Rescue Actions
+    const rescueRes = await fetch(`${API_BASE}/rescue/actions`, {
+      headers: { Authorization: `Bearer ${studentToken}` }
+    })
+    const rescueData = await rescueRes.json()
+    assert(rescueRes.status === 200, 'Deadline rescue actions retrieved HTTP 200')
+    assert(Array.isArray(rescueData.actions), 'Rescue action cards returned as array')
+    assert(Boolean(rescueData.status), `Rescue status determined: ${rescueData.status}`)
+    if (rescueData.actions.length > 0) {
+      const firstAction = rescueData.actions[0]
+      assert(Boolean(firstAction.title), 'Action card has a clear title')
+      assert(Boolean(firstAction.whyItMatters), 'Action card explains why it matters')
+      assert(Boolean(firstAction.actionUrl), 'Action card has a working target URL')
+      assert(Boolean(firstAction.priority), `Action prioritized: ${firstAction.priority}`)
+    }
+
     console.log('\n======================================================')
     console.log(`🎉 ALL ${results.length} TESTS PASSED WITH 100% SUCCESS!`)
     console.log('======================================================\n')
@@ -543,6 +705,7 @@ async function run() {
     // Teardown test accounts cleanly
     try {
       if (studentUserId) {
+        await prisma.studentTask.deleteMany({ where: { userId: studentUserId } }).catch(() => {})
         await prisma.applicationDisbursement.deleteMany({ where: { application: { userId: studentUserId } } })
         await prisma.applicationDocument.deleteMany({ where: { application: { userId: studentUserId } } })
         await prisma.applicationFormData.deleteMany({ where: { application: { userId: studentUserId } } })

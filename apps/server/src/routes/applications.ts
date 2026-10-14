@@ -4,6 +4,7 @@ import{prisma}from'../lib/prisma.js'
 import{authMiddleware}from'../middleware/auth.js'
 import{createApplicationSchema,saveFormDataSchema,attachDocumentSchema,submitApplicationSchema}from'../validators/schemas.js'
 import type{ApplicationStatus}from'../types/index.js'
+import{ReadinessService}from'../services/readinessService.js'
 
 const applications=new Hono<{Variables:{userId:string;role:string}}>()
 applications.use('*',authMiddleware)
@@ -105,17 +106,26 @@ applications.get('/:id',async(c)=>{
     academicRecords:ar
   }
 
-  // Calculate completeness
-  const reqDocs=app.scholarship.requiredDocuments.filter(r=>!r.isOptional)
-  const attachedReqCount=reqDocs.filter(r=>app.documents.some(d=>d.requiredDocumentId===r.id)).length
-  const totalSteps=reqDocs.length+1 // 1 for profile info confirmation
-  const currentProgress=totalSteps>0?Math.round(((attachedReqCount+1)/totalSteps)*100):100
+  // Calculate readiness via authoritative ReadinessService
+  const readiness = await ReadinessService.evaluateReadiness(userId, app.scholarshipId, id)
 
   return c.json({
-    application:{...app,completionPercent:app.status==='DRAFT'?currentProgress:app.completionPercent},
+    application:{...app,completionPercent:app.status==='DRAFT'?readiness.readinessPercentage:app.completionPercent},
     prefill,
-    userDocuments:allUserDocs
+    userDocuments:allUserDocs,
+    readiness
   })
+})
+
+// Application Preflight validation check
+applications.get('/:id/preflight',async(c)=>{
+  const userId=c.get('userId'),id=c.req.param('id')
+  const app=await prisma.application.findUnique({where:{id}})
+  if(!app)return c.json({error:'Not found'},404)
+  if(app.userId!==userId)return c.json({error:'Forbidden'},403)
+
+  const preflight=await ReadinessService.evaluateReadiness(userId,app.scholarshipId,id)
+  return c.json({preflight})
 })
 
 applications.put('/:id/form-data',zValidator('json',saveFormDataSchema),async(c)=>{
@@ -172,6 +182,16 @@ applications.post('/:id/submit',zValidator('json',submitApplicationSchema),async
       error:'MISSING_DOCUMENTS',
       message:`Please attach all required documents (${missing.map((m: any)=>m.label).join(', ')}) before submitting.`,
       missingCount:missing.length
+    },400)
+  }
+
+  // Preflight server-side validation enforcement
+  const preflight=await ReadinessService.evaluateReadiness(userId,app.scholarshipId,id)
+  if(!preflight.canSubmit){
+    return c.json({
+      error:'PREFLIGHT_FAILED',
+      message:preflight.blockingErrors[0]?.message||'Application failed preflight validation checks.',
+      blockingErrors:preflight.blockingErrors
     },400)
   }
 
