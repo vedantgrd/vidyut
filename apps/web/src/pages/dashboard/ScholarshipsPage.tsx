@@ -33,7 +33,7 @@ export function ScholarshipsPage(){
         </div>
       </div>
     </Card>
-    {isLoading?<PageSpinner/>:data?.scholarships.length===0?(
+    {isLoading ? <PageSpinner context="scholarships" /> : data?.scholarships.length === 0 ? (
       <Empty icon={<Award size={24}/>} title="No scholarships found" description="Try adjusting filters or disabling 'eligible only'." action={<Button variant="secondary" onClick={()=>{setSearch('');setCategory('');setOnlyEligible(false)}}>Clear filters</Button>}/>
     ):(
       <>

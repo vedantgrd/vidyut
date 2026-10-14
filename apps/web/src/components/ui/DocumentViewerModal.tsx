@@ -23,6 +23,7 @@ import {
 import { api } from '@/api/client'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
+import { PageSpinner } from '@/components/ui/Spinner'
 
 interface DocumentMetadata {
   id: string
@@ -849,10 +850,7 @@ export function DocumentViewerModal({
                 }}
               >
                 {loadingFile && (
-                  <div style={{ textAlign: 'center', color: '#64748b', padding: 40 }}>
-                    <Loader2 size={32} className="animate-spin" style={{ margin: '0 auto 12px', color: '#1e40af' }} />
-                    <p style={{ fontSize: 13, fontWeight: 500 }}>Decrypting and loading original document...</p>
-                  </div>
+                  <PageSpinner minHeight={200} size={32} text="Decrypting and loading original document..." />
                 )}
 
                 {fileError && !loadingFile && (
@@ -1037,10 +1035,7 @@ export function DocumentViewerModal({
                 }}
               >
                 {loadingMeta ? (
-                  <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
-                    <Loader2 size={28} className="animate-spin" style={{ margin: '0 auto 10px', color: '#1e40af' }} />
-                    <p style={{ fontSize: 13, fontWeight: 500 }}>Fetching Vault verification records...</p>
-                  </div>
+                  <PageSpinner minHeight={180} size={28} text="Fetching Vault verification records..." />
                 ) : (
                   <div
                     style={{

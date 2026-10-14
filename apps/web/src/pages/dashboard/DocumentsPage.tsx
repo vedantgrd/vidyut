@@ -395,7 +395,7 @@ export function DocumentsPage() {
 
       {/* Document List */}
       {isLoading ? (
-        <PageSpinner />
+        <PageSpinner context="documents" />
       ) : filteredDocs.length === 0 ? (
         <Empty
           icon={<FileText size={28} />}

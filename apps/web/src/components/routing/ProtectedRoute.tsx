@@ -1,18 +1,20 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/features/auth/store/authStore'
 
+import { PageSpinner } from '@/components/ui/Spinner'
+
 export function ProtectedRoute() {
   const { isAuthenticated, isRestoringSession, currentUser } = useAuthStore()
   const location = useLocation()
 
   if (isRestoringSession) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#09090b' }}>
-        <div style={{ textAlign: 'center', color: '#a1a1aa' }}>
-          <div style={{ width: 32, height: 32, border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#7c3aed', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
-          <p style={{ fontSize: 14, fontFamily: 'Inter, sans-serif' }}>Loading...</p>
-        </div>
-      </div>
+      <PageSpinner
+        minHeight="100vh"
+        color="rgba(255, 255, 255, 0.85)"
+        context="auth"
+        style={{ backgroundColor: '#09090b' }}
+      />
     )
   }
 

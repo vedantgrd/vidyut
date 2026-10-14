@@ -25,7 +25,7 @@ export function ApplicationsPage(){
     <div style={{display:'flex',gap:8,marginBottom:18,flexWrap:'wrap'}}>
       {FILTERS.map(s=><button key={s} onClick={()=>setFilter(s)} style={{padding:'5px 14px',borderRadius:'var(--radius-full)',border:'1px solid',cursor:'pointer',fontSize:12,fontWeight:filter===s?600:400,background:filter===s?'var(--accent-subtle)':'transparent',borderColor:filter===s?'var(--accent-border)':'var(--border-default)',color:filter===s?'var(--accent-hover)':'var(--text-secondary)'}}>{s==='All'?'All':s.replace(/_/g,' ').toLowerCase().replace(/\w/g,c=>c.toUpperCase())}</button>)}
     </div>
-    {isLoading?<PageSpinner/>:apps.length===0?(
+    {isLoading ? <PageSpinner context="applications" /> : apps.length === 0 ? (
       <Empty icon={<FileText size={24}/>} title="No applications yet" description="Browse eligible scholarships and start your first application." action={<Link to="/scholarships"><Button variant="secondary">Browse Scholarships</Button></Link>}/>
     ):(
       <div style={{display:'flex',flexDirection:'column',gap:10}}>
